@@ -34,8 +34,8 @@ $query_pesanan = mysqli_query($conn, "SELECT p.*, u.nama, u.email, t.jenis_tiket
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - PENTAS.HUB</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../assets/css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/styles.css"
+   
 </head>
 <body>
     <!-- Navbar -->
@@ -62,9 +62,6 @@ $query_pesanan = mysqli_query($conn, "SELECT p.*, u.nama, u.email, t.jenis_tiket
                         <a class="nav-link" href="data_user.php">Data User</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="../index.php">Lihat Website</a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link" href="../logout.php">Logout</a>
                     </li>
                 </ul>
@@ -72,7 +69,7 @@ $query_pesanan = mysqli_query($conn, "SELECT p.*, u.nama, u.email, t.jenis_tiket
         </div>
     </nav>
 
-    <div class="dashboard-container" style="margin-top: 80px;">
+    <div class="dashboard-admin" style="margin-top: 80px;">
         <div class="container-fluid">
             <div class="dashboard-header">
                 <h2>

@@ -22,8 +22,10 @@ $total_pesanan = $count['total'];
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard User - PENTAS.HUB</title>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/styles.css"
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -38,9 +40,7 @@ $total_pesanan = $count['total'];
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="../index.php">Home</a>
-                    </li>
+                   
                     <li class="nav-item">
                         <a class="nav-link active" href="dashboard.php">My Tickets</a>
                     </li>
@@ -60,7 +60,7 @@ $total_pesanan = $count['total'];
             <!-- Header -->
             <div class="dashboard-header">
                 <h2>
-                    <i class="fas fa-user"></i> Dashboard User
+                    <i class="fas fa-user"></i> User
                 </h2>
                 <p class="mb-0">Selamat datang, <strong><?= $_SESSION['nama'] ?></strong></p>
             </div>
@@ -69,7 +69,7 @@ $total_pesanan = $count['total'];
             <div class="row mb-4">
                 <div class="col-md-6">
                     <div class="card-custom">
-                        <h4><i class="fas fa-ticket-alt"></i> Total Pesanan</h4>
+                        <h4><i class="fas fa-ticket-alt"></i> Total Tiket</h4>
                         <h2 style="color: #8b00ff;"><?= $total_pesanan ?></h2>
                     </div>
                 </div>

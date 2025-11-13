@@ -122,7 +122,7 @@ if (AUTO_CONNECT_DB) {
 }
 
 // Base URL (sesuaikan dengan lokasi folder project Anda)
-define('BASE_URL', 'http://localhost/tiket_web/');
+define('BASE_URL', 'http://localhost/project_tiket/');
 
 // Zona waktu
 date_default_timezone_set('Asia/Jakarta');
