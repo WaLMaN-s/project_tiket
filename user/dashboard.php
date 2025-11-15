@@ -81,7 +81,7 @@ $total_pesanan = $count['total'];
                 <div class="col-md-6">
                     <div class="card-custom">
                         <h4><i class="fas fa-calendar"></i> Event Date</h4>
-                        <h2 style="color: #8b00ff;">29 Nov 2025</h2>
+                        <h2 style="color: #8b00ff;">15 Desember 2025</h2>
                     </div>
                 </div>
             </div>
