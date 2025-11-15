@@ -1,60 +1,158 @@
--- Database: tiket_db
--- Buat database terlebih dahulu
-CREATE DATABASE IF NOT EXISTS tiket_db;
-USE tiket_db;
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Host: 127.0.0.1
+-- Generation Time: Nov 15, 2025 at 07:55 AM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
--- Tabel users (untuk admin dan user biasa)
-CREATE TABLE users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nama VARCHAR(100) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    no_hp VARCHAR(20),
-    role ENUM('admin', 'user') DEFAULT 'user',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
 
--- Tabel tiket
-CREATE TABLE tiket (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    jenis_tiket VARCHAR(50) NOT NULL,
-    harga INT NOT NULL,
-    stok INT NOT NULL,
-    deskripsi TEXT,
-    tanggal_event DATE NOT NULL,
-    waktu_event TIME NOT NULL,
-    lokasi VARCHAR(200) NOT NULL,
-    gambar VARCHAR(255),
-    status ENUM('tersedia', 'habis') DEFAULT 'tersedia',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
 
--- Tabel pesanan
-CREATE TABLE pesanan (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    tiket_id INT NOT NULL,
-    jumlah_tiket INT NOT NULL,
-    total_harga INT NOT NULL,
-    nama_pemesan VARCHAR(100) NOT NULL,
-    email_pemesan VARCHAR(100) NOT NULL,
-    no_hp_pemesan VARCHAR(20) NOT NULL,
-    status_pesanan ENUM('pending', 'berhasil', 'dibatalkan') DEFAULT 'pending',
-    tanggal_pesan TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (tiket_id) REFERENCES tiket(id) ON DELETE CASCADE
-);
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
 
--- Insert admin default
-INSERT INTO users (nama, email, password, no_hp, role) 
-VALUES ('Admin', 'admin@pentashub.com', MD5('admin123'), '081234567890', 'admin');
+--
+-- Database: `tiket_db`
+--
 
--- Insert sample tiket berdasarkan poster
-INSERT INTO tiket (jenis_tiket, harga, stok, deskripsi, tanggal_event, waktu_event, lokasi, status) VALUES
-('VVIP', 800000, 50, 'Akses VVIP dengan fasilitas eksklusif, standing area terdepan, meet & greet, merchandise eksklusif', '2025-11-29', '19:30:00', 'GBK Senayan, Jakarta', 'tersedia'),
-('Festival', 250000, 200, 'Tiket reguler festival, standing area, akses penuh ke semua panggung', '2025-11-29', '19:30:00', 'GBK Senayan, Jakarta', 'tersedia'),
-('VIP', 500000, 100, 'Akses VIP dengan kursi prioritas, lounge akses, merchandise', '2025-11-29', '19:30:00', 'GBK Senayan, Jakarta', 'tersedia');
+-- --------------------------------------------------------
 
--- Insert sample user
-INSERT INTO users (nama, email, password, no_hp, role) 
-VALUES ('John Doe', 'user@example.com', MD5('user123'), '081298765432', 'user');
+--
+-- Table structure for table `pesanan`
+--
+
+CREATE TABLE `pesanan` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `tiket_id` int(11) NOT NULL,
+  `jumlah_tiket` int(11) NOT NULL,
+  `total_harga` int(11) NOT NULL,
+  `nama_pemesan` varchar(100) NOT NULL,
+  `email_pemesan` varchar(100) NOT NULL,
+  `no_hp_pemesan` varchar(20) NOT NULL,
+  `status_pesanan` enum('pending','berhasil','dibatalkan') DEFAULT 'pending',
+  `tanggal_pesan` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tiket`
+--
+
+CREATE TABLE `tiket` (
+  `id` int(11) NOT NULL,
+  `jenis_tiket` varchar(50) NOT NULL,
+  `harga` int(11) NOT NULL,
+  `stok` int(11) NOT NULL,
+  `deskripsi` text DEFAULT NULL,
+  `tanggal_event` date NOT NULL,
+  `waktu_event` time NOT NULL,
+  `lokasi` varchar(200) NOT NULL,
+  `gambar` varchar(255) DEFAULT NULL,
+  `status` enum('tersedia','habis') DEFAULT 'tersedia',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tiket`
+--
+
+INSERT INTO `tiket` (`id`, `jenis_tiket`, `harga`, `stok`, `deskripsi`, `tanggal_event`, `waktu_event`, `lokasi`, `gambar`, `status`, `created_at`) VALUES
+(4, 'Festival', 50000, 100, 'Tiket Festival memberikan akses ke area penonton umum yang berdiri bebas. Tiket ini menawarkan pengalaman menonton konser dengan suasana meriah di tengah keramaian, cocok untuk penonton yang ingin menikmati energi acara secara langsung.', '2025-12-15', '19:30:00', 'GBK senayan', NULL, 'tersedia', '2025-11-15 06:06:12'),
+(5, 'VIP', 100000, 75, 'Tiket VIP memberikan akses ke area khusus yang lebih dekat ke panggung dengan kapasitas terbatas. Tiket ini menawarkan kenyamanan lebih, ruang yang tidak terlalu padat, serta pengalaman menonton yang lebih eksklusif.', '2025-12-15', '19:30:00', 'GBK senayan', NULL, 'tersedia', '2025-11-15 06:07:15'),
+(6, 'VVIP', 250000, 50, 'Tiket VVIP memberikan akses ke area premium paling dekat dengan panggung. Tiket ini dirancang untuk memberikan pengalaman konser terbaik, dengan fasilitas eksklusif dan kenyamanan maksimal sepanjang acara.', '2025-12-15', '19:30:00', 'GBK senayan', NULL, 'tersedia', '2025-11-15 06:08:26');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `users`
+--
+
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL,
+  `nama` varchar(100) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `no_hp` varchar(20) DEFAULT NULL,
+  `role` enum('admin','user') DEFAULT 'user',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`id`, `nama`, `email`, `password`, `no_hp`, `role`, `created_at`) VALUES
+(1, 'Admin', 'admin@pentashub.com', '0192023a7bbd73250516f069df18b500', '081234567890', 'admin', '2025-11-11 03:16:48'),
+(2, 'John Doe', 'user@example.com', '6ad14ba9986e3615423dfca256d04e3f', '081298765432', 'user', '2025-11-11 03:16:48'),
+(3, 'FABER WALMAN SITORUS', 'fabersitorus88@gmail.com', '80036d06b5930e4aefd7b8cc3deb16c5', '081266523463', 'user', '2025-11-11 03:30:07');
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `pesanan`
+--
+ALTER TABLE `pesanan`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `tiket_id` (`tiket_id`);
+
+--
+-- Indexes for table `tiket`
+--
+ALTER TABLE `tiket`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `email` (`email`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `pesanan`
+--
+ALTER TABLE `pesanan`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `tiket`
+--
+ALTER TABLE `tiket`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT for table `users`
+--
+ALTER TABLE `users`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `pesanan`
+--
+ALTER TABLE `pesanan`
+  ADD CONSTRAINT `pesanan_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `pesanan_ibfk_2` FOREIGN KEY (`tiket_id`) REFERENCES `tiket` (`id`) ON DELETE CASCADE;
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
