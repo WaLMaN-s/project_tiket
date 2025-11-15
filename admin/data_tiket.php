@@ -43,7 +43,7 @@ $query = mysqli_query($conn, "SELECT * FROM tiket ORDER BY id DESC");
                         <a class="nav-link" href="data_user.php">Data User</a>
                     </li>
                 
-                    <li class="nav-item">
+                    <li class  ="nav-item">
                         <a class="nav-link" href="../logout.php">Logout</a>
                     </li>
                 </ul>

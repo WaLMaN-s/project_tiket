@@ -6,9 +6,19 @@ require_once '../includes/session.php';
 
 requireUser();
 
-$id_tiket = $_GET['id'];
-$query = mysqli_query($conn, "SELECT * FROM tiket WHERE id='$id_tiket'");
-$tiket = mysqli_fetch_assoc($query);
+// Validasi dan ambil ID tiket dengan aman
+if(!isset($_GET['id']) || !is_numeric($_GET['id'])) {
+    redirect('dashboard.php');
+}
+
+$id_tiket = (int)$_GET['id'];
+
+// Ambil data tiket dengan prepared statement
+$stmt = $conn->prepare("SELECT * FROM tiket WHERE id=?");
+$stmt->bind_param("i", $id_tiket);
+$stmt->execute();
+$result = $stmt->get_result();
+$tiket = $result->fetch_assoc();
 
 if(!$tiket) {
     redirect('dashboard.php');
@@ -33,13 +43,16 @@ if(isset($_POST['pesan'])) {
         $total_harga = $jumlah_tiket * $tiket['harga'];
         $user_id = $_SESSION['user_id'];
         
-        // Insert pesanan
-        $query_insert = mysqli_query($conn, "INSERT INTO pesanan 
+        // Insert pesanan dengan prepared statement
+        $stmt_insert = $conn->prepare("INSERT INTO pesanan 
             (user_id, tiket_id, jumlah_tiket, total_harga, nama_pemesan, email_pemesan, no_hp_pemesan, status_pesanan) 
             VALUES 
-            ('$user_id', '$id_tiket', '$jumlah_tiket', '$total_harga', '$nama_pemesan', '$email_pemesan', '$no_hp_pemesan', 'berhasil')");
+            (?, ?, ?, ?, ?, ?, ?, 'berhasil')");
         
-        if($query_insert) {
+        $stmt_insert->bind_param("iiidsss", $user_id, $id_tiket, $jumlah_tiket, $total_harga, 
+                                   $nama_pemesan, $email_pemesan, $no_hp_pemesan);
+        
+        if($stmt_insert->execute()) {
             // Update stok tiket
             updateStokTiket($id_tiket, $jumlah_tiket, 'kurang');
             
@@ -50,7 +63,7 @@ if(isset($_POST['pesan'])) {
                 }, 2000);
             </script>";
         } else {
-            $error = 'Pemesanan gagal! ' . mysqli_error($conn);
+            $error = 'Pemesanan gagal! ' . $conn->error;
         }
     }
 }
@@ -75,7 +88,7 @@ if(isset($_POST['pesan'])) {
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-colla   pse" id="navbarNav">
+            <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="../index.php">Home</a>
@@ -96,16 +109,16 @@ if(isset($_POST['pesan'])) {
 
     <div class="dashboard-container" style="margin-top: 80px;">
         <div class="container">
-            <a href="detail_tiket.php?id=<?= $id_tiket ?>" class="btn btn-secondary mb-4">
+            <a href="dashboard.php" class="btn btn-secondary mb-4">
                 <i class="fas fa-arrow-left"></i> Kembali
             </a>
 
             <?php if($error): ?>
-                <div class="alert alert-danger"><?= $error ?></div>
+                <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
             <?php endif; ?>
 
             <?php if($success): ?>
-                <div class="alert alert-success"><?= $success ?></div>
+                <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
             <?php endif; ?>
 
             <div class="row">
@@ -119,19 +132,19 @@ if(isset($_POST['pesan'])) {
                             <div class="mb-3">
                                 <label class="form-label">Nama Pemesan</label>
                                 <input type="text" name="nama_pemesan" class="form-control" 
-                                       value="<?= $user_data['nama'] ?>" required>
+                                       value="<?= htmlspecialchars($user_data['nama']) ?>" required>
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label">Email Pemesan</label>
                                 <input type="email" name="email_pemesan" class="form-control" 
-                                       value="<?= $user_data['email'] ?>" required>
+                                       value="<?= htmlspecialchars($user_data['email']) ?>" required>
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label">No. HP Pemesan</label>
                                 <input type="text" name="no_hp_pemesan" class="form-control" 
-                                       value="<?= $user_data['no_hp'] ?>" required>
+                                       value="<?= htmlspecialchars($user_data['no_hp']) ?>" required>
                             </div>
 
                             <div class="mb-3">
@@ -158,11 +171,11 @@ if(isset($_POST['pesan'])) {
                             <strong>Jenis Tiket:</strong><br>
                             <span class="ticket-type">
                                 <?php if($tiket['jenis_tiket'] == 'VVIP'): ?>
-                                    <span class="badge-vvip"><?= $tiket['jenis_tiket'] ?></span>
+                                    <span class="badge-vvip"><?= htmlspecialchars($tiket['jenis_tiket']) ?></span>
                                 <?php elseif($tiket['jenis_tiket'] == 'VIP'): ?>
-                                    <span class="badge-vip"><?= $tiket['jenis_tiket'] ?></span>
+                                    <span class="badge-vip"><?= htmlspecialchars($tiket['jenis_tiket']) ?></span>
                                 <?php else: ?>
-                                    <span class="badge-festival"><?= $tiket['jenis_tiket'] ?></span>
+                                    <span class="badge-festival"><?= htmlspecialchars($tiket['jenis_tiket']) ?></span>
                                 <?php endif; ?>
                             </span>
                         </div>
@@ -186,7 +199,7 @@ if(isset($_POST['pesan'])) {
 
                         <div class="mb-3">
                             <strong>Lokasi:</strong><br>
-                            <?= $tiket['lokasi'] ?>
+                            <?= htmlspecialchars($tiket['lokasi']) ?>
                         </div>
 
                         <hr style="border-color: #8b00ff;">

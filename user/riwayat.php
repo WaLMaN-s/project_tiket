@@ -7,11 +7,16 @@ require_once '../includes/session.php';
 requireUser();
 
 $user_id = $_SESSION['user_id'];
-$query = mysqli_query($conn, "SELECT p.*, t.jenis_tiket, t.tanggal_event, t.waktu_event, t.lokasi 
-                               FROM pesanan p 
-                               JOIN tiket t ON p.tiket_id = t.id 
-                               WHERE p.user_id='$user_id' 
-                               ORDER BY p.tanggal_pesan DESC");
+
+// Query hanya pesanan yang TIDAK dibatalkan
+$stmt = $conn->prepare("SELECT p.*, t.jenis_tiket, t.tanggal_event, t.waktu_event, t.lokasi 
+                        FROM pesanan p 
+                        JOIN tiket t ON p.tiket_id = t.id 
+                        WHERE p.user_id = ? AND p.status_pesanan != 'dibatalkan'
+                        ORDER BY p.tanggal_pesan DESC");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -20,7 +25,7 @@ $query = mysqli_query($conn, "SELECT p.*, t.jenis_tiket, t.tanggal_event, t.wakt
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Riwayat Pesanan - PENTAS.HUB</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../assets/css/styles.css"
+    <link rel="stylesheet" href="../assets/css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -58,10 +63,11 @@ $query = mysqli_query($conn, "SELECT p.*, t.jenis_tiket, t.tanggal_event, t.wakt
                 <h2>
                     <i class="fas fa-history"></i> Riwayat Pesanan
                 </h2>
+                <p class="mb-0 text-muted">Daftar pesanan tiket aktif Anda</p>
             </div>
 
             <div class="card-custom">
-                <?php if(mysqli_num_rows($query) > 0): ?>
+                <?php if($result->num_rows > 0): ?>
                 <div class="table-responsive">
                     <table class="table table-custom table-hover">
                         <thead>
@@ -78,18 +84,18 @@ $query = mysqli_query($conn, "SELECT p.*, t.jenis_tiket, t.tanggal_event, t.wakt
                         <tbody>
                             <?php 
                             $no = 1;
-                            while($pesanan = mysqli_fetch_assoc($query)): 
+                            while($pesanan = $result->fetch_assoc()): 
                             ?>
                             <tr>
                                 <td><?= $no++ ?></td>
                                 <td><?= date('d/m/Y H:i', strtotime($pesanan['tanggal_pesan'])) ?></td>
                                 <td>
                                     <?php if($pesanan['jenis_tiket'] == 'VVIP'): ?>
-                                        <span class="badge-vvip"><?= $pesanan['jenis_tiket'] ?></span>
+                                        <span class="badge-vvip"><?= htmlspecialchars($pesanan['jenis_tiket']) ?></span>
                                     <?php elseif($pesanan['jenis_tiket'] == 'VIP'): ?>
-                                        <span class="badge-vip"><?= $pesanan['jenis_tiket'] ?></span>
+                                        <span class="badge-vip"><?= htmlspecialchars($pesanan['jenis_tiket']) ?></span>
                                     <?php else: ?>
-                                        <span class="badge-festival"><?= $pesanan['jenis_tiket'] ?></span>
+                                        <span class="badge-festival"><?= htmlspecialchars($pesanan['jenis_tiket']) ?></span>
                                     <?php endif; ?>
                                 </td>
                                 <td><?= $pesanan['jumlah_tiket'] ?> tiket</td>
@@ -98,9 +104,7 @@ $query = mysqli_query($conn, "SELECT p.*, t.jenis_tiket, t.tanggal_event, t.wakt
                                     <?php if($pesanan['status_pesanan'] == 'berhasil'): ?>
                                         <span class="badge bg-success">Berhasil</span>
                                     <?php elseif($pesanan['status_pesanan'] == 'pending'): ?>
-                                        <span class="badge bg-warning">Pending</span>
-                                    <?php else: ?>
-                                        <span class="badge bg-danger">Dibatalkan</span>
+                                        <span class="badge bg-warning text-dark">Pending</span>
                                     <?php endif; ?>
                                 </td>
                                 <td>
@@ -120,7 +124,7 @@ $query = mysqli_query($conn, "SELECT p.*, t.jenis_tiket, t.tanggal_event, t.wakt
                 <?php else: ?>
                     <div class="text-center py-5">
                         <i class="fas fa-inbox" style="font-size: 4rem; color: #8b00ff;"></i>
-                        <h4 class="mt-3">Belum ada riwayat pesanan</h4>
+                        <h4 class="mt-3">Belum ada pesanan aktif</h4>
                         <p class="text-muted">Mulai pesan tiket sekarang!</p>
                         <a href="dashboard.php" class="btn btn-custom">
                             <i class="fas fa-shopping-cart"></i> Pesan Tiket

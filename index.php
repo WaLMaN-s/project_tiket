@@ -4,8 +4,10 @@ require_once 'includes/config.php';
 require_once 'includes/functions.php';
 require_once 'includes/session.php';
 
-// Ambil data tiket dari database
-$query_tiket = mysqli_query($conn, "SELECT * FROM tiket WHERE status='tersedia' ORDER BY harga ASC");
+// Ambil data tiket dari database dengan prepared statement
+$stmt = $conn->prepare("SELECT * FROM tiket WHERE status='tersedia' AND stok > 0 ORDER BY harga ASC");
+$stmt->execute();
+$result_tiket = $stmt->get_result();
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -22,6 +24,17 @@ $query_tiket = mysqli_query($conn, "SELECT * FROM tiket WHERE status='tersedia' 
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Background Image CSS - Inline untuk kemudahan path -->
+    <style>
+        .hero-section {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                  url('https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+    </style>
 </head>
 <body>
     <!-- Navbar -->
@@ -72,8 +85,8 @@ $query_tiket = mysqli_query($conn, "SELECT * FROM tiket WHERE status='tersedia' 
         <div class="hero-content">
             <h1 class="hero-title">PENTAS.HUB</h1>
             <p class="hero-subtitle">MUSIC FESTIVAL</p>
-            <p class="hero-date">29 NOVEMBER 2025</p>
-            <p style="font-size: 1.2rem; margin-bottom: 2rem;">
+            <p class="hero-date">15 Desember 2025</p>
+            <p class="hero-info">
                 <i class="fas fa-map-marker-alt"></i> GBK SENAYAN, JAKARTA<br>
                 <i class="fas fa-clock"></i> 19.30 WIB - SELESAI
             </p>
@@ -88,17 +101,18 @@ $query_tiket = mysqli_query($conn, "SELECT * FROM tiket WHERE status='tersedia' 
         <div class="container">
             <h2 class="section-title">DAFTAR HARGA TIKET</h2>
             
+            <?php if($result_tiket->num_rows > 0): ?>
             <div class="row">
-                <?php while($tiket = mysqli_fetch_assoc($query_tiket)): ?>
-                <div class="col-md-4">
+                <?php while($tiket = $result_tiket->fetch_assoc()): ?>
+                <div class="col-md-4 mb-4">
                     <div class="ticket-card">
                         <div class="ticket-type">
                             <?php if($tiket['jenis_tiket'] == 'VVIP'): ?>
-                                <span class="badge-vvip"><?= $tiket['jenis_tiket'] ?></span>
+                                <span class="badge-vvip"><?= htmlspecialchars($tiket['jenis_tiket']) ?></span>
                             <?php elseif($tiket['jenis_tiket'] == 'VIP'): ?>
-                                <span class="badge-vip"><?= $tiket['jenis_tiket'] ?></span>
+                                <span class="badge-vip"><?= htmlspecialchars($tiket['jenis_tiket']) ?></span>
                             <?php else: ?>
-                                <span class="badge-festival"><?= $tiket['jenis_tiket'] ?></span>
+                                <span class="badge-festival"><?= htmlspecialchars($tiket['jenis_tiket']) ?></span>
                             <?php endif; ?>
                         </div>
                         
@@ -107,7 +121,7 @@ $query_tiket = mysqli_query($conn, "SELECT * FROM tiket WHERE status='tersedia' 
                         </div>
                         
                         <div class="ticket-desc">
-                            <?= nl2br($tiket['deskripsi']) ?>
+                            <?= nl2br(htmlspecialchars($tiket['deskripsi'])) ?>
                         </div>
                         
                         <div class="ticket-info">
@@ -129,7 +143,7 @@ $query_tiket = mysqli_query($conn, "SELECT * FROM tiket WHERE status='tersedia' 
                         </div>
                         
                         <?php if(isLoggedIn() && isUser()): ?>
-                            <a href="user/detail_tiket.php?id=<?= $tiket['id'] ?>" class="btn btn-book">
+                            <a href="user/pesan_tiket.php?id=<?= $tiket['id'] ?>" class="btn btn-book">
                                 <i class="fas fa-shopping-cart"></i> PESAN SEKARANG
                             </a>
                         <?php else: ?>
@@ -141,6 +155,13 @@ $query_tiket = mysqli_query($conn, "SELECT * FROM tiket WHERE status='tersedia' 
                 </div>
                 <?php endwhile; ?>
             </div>
+            <?php else: ?>
+                <div class="text-center py-5">
+                    <i class="fas fa-ticket-alt" style="font-size: 4rem; color: #8b00ff;"></i>
+                    <h4 class="mt-3" style="color: white;">Tiket Belum Tersedia</h4>
+                    <p class="text-muted">Segera hadir! Stay tuned untuk pembelian tiket.</p>
+                </div>
+            <?php endif; ?>
         </div>
     </section>
 

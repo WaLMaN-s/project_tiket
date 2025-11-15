@@ -8,12 +8,16 @@ requireUser();
 
 $user_id = $_SESSION['user_id'];
 
-// Ambil data tiket yang tersedia
-$query_tiket = mysqli_query($conn, "SELECT * FROM tiket WHERE status='tersedia' ORDER BY harga ASC");
+// Ambil data tiket yang tersedia dengan prepared statement
+$stmt = $conn->prepare("SELECT * FROM tiket WHERE status='tersedia' AND stok > 0 ORDER BY harga ASC");
+$stmt->execute();
+$result_tiket = $stmt->get_result();
 
-// Hitung total pesanan user
-$query_count = mysqli_query($conn, "SELECT COUNT(*) as total FROM pesanan WHERE user_id='$user_id'");
-$count = mysqli_fetch_assoc($query_count);
+// Hitung total pesanan user YANG TIDAK DIBATALKAN
+$stmt_count = $conn->prepare("SELECT COUNT(*) as total FROM pesanan WHERE user_id=? AND status_pesanan != 'dibatalkan'");
+$stmt_count->bind_param("i", $user_id);
+$stmt_count->execute();
+$count = $stmt_count->get_result()->fetch_assoc();
 $total_pesanan = $count['total'];
 ?>
 <!DOCTYPE html>
@@ -24,7 +28,7 @@ $total_pesanan = $count['total'];
     <title>Dashboard User - PENTAS.HUB</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../assets/css/styles.css"
+    <link rel="stylesheet" href="../assets/css/styles.css">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -62,15 +66,16 @@ $total_pesanan = $count['total'];
                 <h2>
                     <i class="fas fa-user"></i> User
                 </h2>
-                <p class="mb-0">Selamat datang, <strong><?= $_SESSION['nama'] ?></strong></p>
+                <p class="mb-0">Selamat datang, <strong><?= htmlspecialchars($_SESSION['nama']) ?></strong></p>
             </div>
 
             <!-- Stats -->
             <div class="row mb-4">
                 <div class="col-md-6">
                     <div class="card-custom">
-                        <h4><i class="fas fa-ticket-alt"></i> Total Tiket</h4>
+                        <h4><i class="fas fa-ticket-alt"></i> Total Tiket Aktif</h4>
                         <h2 style="color: #8b00ff;"><?= $total_pesanan ?></h2>
+                        <small class="text-muted">Pesanan yang berhasil</small>
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -86,17 +91,23 @@ $total_pesanan = $count['total'];
                 <i class="fas fa-list"></i> Tiket Tersedia
             </h3>
 
+            <?php if($result_tiket->num_rows == 0): ?>
+                <div class="alert alert-info text-center">
+                    <i class="fas fa-info-circle"></i> 
+                    Tidak ada tiket yang tersedia saat ini.
+                </div>
+            <?php else: ?>
             <div class="row">
-                <?php while($tiket = mysqli_fetch_assoc($query_tiket)): ?>
-                <div class="col-md-4">
+                <?php while($tiket = $result_tiket->fetch_assoc()): ?>
+                <div class="col-md-4 mb-4">
                     <div class="ticket-card">
                         <div class="ticket-type">
                             <?php if($tiket['jenis_tiket'] == 'VVIP'): ?>
-                                <span class="badge-vvip"><?= $tiket['jenis_tiket'] ?></span>
+                                <span class="badge-vvip"><?= htmlspecialchars($tiket['jenis_tiket']) ?></span>
                             <?php elseif($tiket['jenis_tiket'] == 'VIP'): ?>
-                                <span class="badge-vip"><?= $tiket['jenis_tiket'] ?></span>
+                                <span class="badge-vip"><?= htmlspecialchars($tiket['jenis_tiket']) ?></span>
                             <?php else: ?>
-                                <span class="badge-festival"><?= $tiket['jenis_tiket'] ?></span>
+                                <span class="badge-festival"><?= htmlspecialchars($tiket['jenis_tiket']) ?></span>
                             <?php endif; ?>
                         </div>
                         
@@ -105,7 +116,7 @@ $total_pesanan = $count['total'];
                         </div>
                         
                         <div class="ticket-desc">
-                            <?= nl2br($tiket['deskripsi']) ?>
+                            <?= nl2br(htmlspecialchars($tiket['deskripsi'])) ?>
                         </div>
                         
                         <div class="ticket-info">
@@ -126,13 +137,14 @@ $total_pesanan = $count['total'];
                             </div>
                         </div>
                         
-                        <a href="detail_tiket.php?id=<?= $tiket['id'] ?>" class="btn btn-book">
+                        <a href="pesan_tiket.php?id=<?= $tiket['id'] ?>" class="btn btn-book">
                             <i class="fas fa-shopping-cart"></i> PESAN SEKARANG
                         </a>
                     </div>
                 </div>
                 <?php endwhile; ?>
             </div>
+            <?php endif; ?>
         </div>
     </div>
 
