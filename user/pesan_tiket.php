@@ -1,9 +1,4 @@
 <?php
-// AKTIFKAN ERROR REPORTING UNTUK DEBUGGING
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 session_start();
 require_once '../includes/config.php';
 require_once '../includes/functions.php';
@@ -11,66 +6,43 @@ require_once '../includes/session.php';
 
 requireUser();
 
-// Validasi dan ambil ID tiket dengan aman
-if(!isset($_GET['id']) || !is_numeric($_GET['id'])) {
+if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     redirect('dashboard.php');
 }
 
 $id_tiket = (int)$_GET['id'];
 
-// Ambil data tiket dengan prepared statement
-$stmt = $conn->prepare("SELECT * FROM tiket WHERE id=?");
+$stmt = $conn->prepare("SELECT * FROM tiket WHERE id = ?");
 $stmt->bind_param("i", $id_tiket);
 $stmt->execute();
-$result = $stmt->get_result();
-$tiket = $result->fetch_assoc();
+$tiket = $stmt->get_result()->fetch_assoc();
 
-if(!$tiket) {
-    redirect('dashboard.php');
-}
+if (!$tiket) redirect('dashboard.php');
 
 $user_data = getUserData();
 $error = '';
 
-if(isset($_POST['pesan'])) {
-    $jumlah_tiket = (int)$_POST['jumlah_tiket'];
-    $nama_pemesan = clean($_POST['nama_pemesan']);
-    $email_pemesan = clean($_POST['email_pemesan']);
-    $no_hp_pemesan = clean($_POST['no_hp_pemesan']);
-    
-    // Validasi
-    if($jumlah_tiket < 1) {
-        $error = 'Jumlah tiket minimal 1!';
-    } elseif($jumlah_tiket > $tiket['stok']) {
-        $error = 'Stok tiket tidak mencukupi!';
+if (isset($_POST['pesan'])) {
+    $jumlah = (int)$_POST['jumlah_tiket'];
+    if ($jumlah < 1) {
+        $error = 'Jumlah minimal 1 tiket!';
+    } elseif ($jumlah > $tiket['stok']) {
+        $error = 'Stok tidak mencukupi!';
     } else {
-        // Debug: cek apakah sampai di sini
-        error_log("Form submitted successfully");
-
-        // Simpan data sementara ke session
         $_SESSION['temp_order'] = [
             'tiket_id' => $id_tiket,
-            'jumlah_tiket' => $jumlah_tiket,
-            'nama_pemesan' => $nama_pemesan,
-            'email_pemesan' => $email_pemesan,
-            'no_hp_pemesan' => $no_hp_pemesan,
-            'total_harga' => $jumlah_tiket * $tiket['harga'],
+            'jumlah_tiket' => $jumlah,
+            'nama_pemesan' => clean($_POST['nama_pemesan']),
+            'email_pemesan' => clean($_POST['email_pemesan']),
+            'no_hp_pemesan' => clean($_POST['no_hp_pemesan']),
+            'total_harga' => $jumlah * $tiket['harga'],
             'jenis_tiket' => $tiket['jenis_tiket']
         ];
-
-        // Debug: cek session
-        error_log("Session data set: " . print_r($_SESSION['temp_order'], true));
-
-        // PERBAIKAN UTAMA: pastikan tidak ada output sebelum redirect
-        ob_clean(); // Bersihkan output buffer
-        flush();    // Flush output buffer
-        
-        // Redirect ke halaman metode pembayaran
         redirect('metode-pembayaran.php');
-        exit(); // Pastikan script berhenti di sini
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -116,7 +88,7 @@ if(isset($_POST['pesan'])) {
                 <i class="fas fa-arrow-left"></i> Kembali
             </a>
 
-            <?php if($error): ?>
+            <?php if ($error): ?>
                 <div class="alert alert-danger alert-dismissible fade show">
                     <?= htmlspecialchars($error) ?>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -130,7 +102,7 @@ if(isset($_POST['pesan'])) {
                             <i class="fas fa-shopping-cart me-2"></i> Form Pemesanan Tiket
                         </h2>
 
-                        <form method="POST" action="">
+                        <form method="POST">
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Nama Pemesan</label>
                                 <input type="text" name="nama_pemesan" class="form-control bg-purple-dark border-purple text-white" 
@@ -246,22 +218,8 @@ if(isset($_POST['pesan'])) {
             document.getElementById('total_harga').textContent = formatRupiah(total);
         }
         
-        // Trigger initial calculation
         document.addEventListener('DOMContentLoaded', function() {
             hitungTotal();
-        });
-
-        // Tambahkan event listener untuk form submission
-        document.querySelector('form').addEventListener('submit', function(e) {
-            const submitBtn = this.querySelector('button[type="submit"]');
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Mengarahkan...';
-            
-            // Kembalikan tombol setelah 3 detik jika redirect gagal
-            setTimeout(function() {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fas fa-arrow-right me-2"></i> LANJUT KE PEMBAYARAN';
-            }, 3000);
         });
     </script>
 </body>

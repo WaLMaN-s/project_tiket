@@ -10,6 +10,7 @@ function formatTanggal($tanggal) {
         1 => 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
         'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
     );
+    
     $split = explode('-', $tanggal);
     return $split[2] . ' ' . $bulan[(int)$split[1]] . ' ' . $split[0];
 }
@@ -19,7 +20,7 @@ function formatWaktu($waktu) {
     return date('H:i', strtotime($waktu)) . ' WIB';
 }
 
-// Sanitasi input (tanpa escape database)
+// Sanitasi input
 function clean($data) {
     $data = trim($data);
     $data = stripslashes($data);
@@ -28,11 +29,11 @@ function clean($data) {
 
 // Redirect
 function redirect($url) {
-    echo "<script>window.location.href='" . $url . "';</script>";
+    header("Location: " . $url);
     exit();
 }
 
-// Upload gambar (hanya untuk upload gambar tiket di admin)
+// Upload gambar (hanya untuk admin)
 function uploadGambar($file) {
     $target_dir = "../assets/images/tiket/";
     $file_name = time() . '_' . basename($file["name"]);
@@ -49,9 +50,4 @@ function uploadGambar($file) {
     }
     return false;
 }
-
-// ❌ HAPUS FUNGSI BERBAHAYA (pakai prepared statement di file terpisah):
-// - cekStokTiket()
-// - updateStokTiket()
-// - alert() → ganti dengan echo manual
 ?>

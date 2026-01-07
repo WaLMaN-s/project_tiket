@@ -35,7 +35,52 @@ $result_tiket = $stmt->get_result();
             background-attachment: fixed;
         }
     </style>
+    <style>
+    /* ... CSS sebelumnya ... */
+
+    .countdown-container {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .countdown-box {
+        background: rgba(227, 152, 254, 0.2);
+        border: 2px solid #b803ffff;
+        border-radius: 12px;
+        padding: 12px 8px;
+        min-width: 70px;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+    }
+
+    .countdown-number {
+        font-size: 2.2rem;
+        font-weight: bold;
+        color: #f21e0fff;
+        display: block;
+    }
+
+    .countdown-label {
+        font: bold;
+        font-size: 1rem;
+        color: #e60e0eff;
+        margin-top: 4px;
+        display: block;
+    }
+
+    @media (max-width: 768px) {
+        .countdown-number {
+            font-size: 1.6rem;
+        }
+        .countdown-box {
+            min-width: 55px;
+            padding: 8px 4px;
+        }
+    }
+</style>
 </head>
+
+
 <body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
@@ -79,22 +124,45 @@ $result_tiket = $stmt->get_result();
             </div>
         </div>
     </nav>
-
-    <!-- Hero Section -->
-    <section id="home" class="hero-section">
-        <div class="hero-content">
-            <h1 class="hero-title">PENTAS.HUB</h1>
-            <p class="hero-subtitle">MUSIC FESTIVAL</p>
-            <p class="hero-date">15 Desember 2025</p>
-            <p class="hero-info">
-                <i class="fas fa-map-marker-alt"></i> GBK SENAYAN, JAKARTA<br>
-                <i class="fas fa-clock"></i> 19.30 WIB - SELESAI
-            </p>
-            <a href="#tickets" class="btn btn-custom btn-lg">
-                <i class="fas fa-ticket-alt"></i> DAFTAR HARGA TIKET
-            </a>
+<!-- Hero Section -->
+<section id="home" class="hero-section">
+    <div class="hero-content text-center">
+        <h1 class="hero-title">PENTAS.HUB</h1>
+        <p class="hero-subtitle">MUSIC FESTIVAL</p>
+        <p class="hero-date">14 February 2026</p>
+        
+        <!-- Countdown Timer -->
+        <div class="countdown-container my-4">
+            <div class="countdown-label text-white mb-2">Sisa Waktu Menuju Konser</div>
+            <div id="countdown" class="d-flex justify-content-center gap-3 flex-wrap">
+                <div class="countdown-box">
+                    <span class="countdown-number" id="days">00</span>
+                    <span class="countdown-label">Hari</span>
+                </div>
+                <div class="countdown-box">
+                    <span class="countdown-number" id="hours">00</span>
+                    <span class="countdown-label">Jam</span>
+                </div>
+                <div class="countdown-box">
+                    <span class="countdown-number" id="minutes">00</span>
+                    <span class="countdown-label">Menit</span>
+                </div>
+                <div class="countdown-box">
+                    <span class="countdown-number" id="seconds">00</span>
+                    <span class="countdown-label">Detik</span>
+                </div>
+            </div>
         </div>
-    </section>
+
+        <p class="hero-info">
+            <i class="fas fa-map-marker-alt"></i> GBK SENAYAN, JAKARTA<br>
+            <i class="fas fa-clock"></i> 19.30 WIB - SELESAI
+        </p>
+        <a href="#tickets" class="btn btn-custom btn-lg">
+            <i class="fas fa-ticket-alt"></i> DAFTAR HARGA TIKET
+        </a>
+    </div>
+</section>
 
     <!-- Tickets Section -->
     <section id="tickets" class="ticket-section">
@@ -168,7 +236,7 @@ $result_tiket = $stmt->get_result();
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2025 PENTAS.HUB Music Festival. All Rights Reserved.</p>
+            <p>&copy; 2026 PENTAS.HUB Music Festival. All Rights Reserved.</p>
             <p>
                 <i class="fas fa-globe"></i> www.feastkonser.com
             </p>
@@ -193,5 +261,41 @@ $result_tiket = $stmt->get_result();
             });
         });
     </script>
+    <script>
+    // Target: 14 Februari 2025, 19.30 WIB
+    // Gunakan waktu lokal Indonesia (WIB = UTC+7)
+    // Format ISO dengan zona waktu
+    const targetDate = new Date('2026-02-14T19:30:00+07:00');
+
+    function updateCountdown() {
+        const now = new Date();
+        const diff = targetDate - now;
+
+        if (diff <= 0) {
+            // Event sudah dimulai
+            document.getElementById('countdown').innerHTML = 
+                '<div class="text-center" style="color: #ff0101ff; font-weight: bold; font-size: 1.3rem;">🎉 KONSER SEDANG BERLANGSUNG!</div>';
+            return;
+        }
+
+        // Hitung komponen waktu
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+        // Update tampilan
+        document.getElementById('days').textContent = String(days).padStart(2, '0');
+        document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+        document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+        document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+    }
+
+    // Jalankan pertama kali
+    updateCountdown();
+
+    // Update setiap 1000 ms (1 detik) → INI YANG MEMBUATNYA "JALAN TERUS"
+    const countdownInterval = setInterval(updateCountdown, 1000);
+</script>
 </body>
 </html>

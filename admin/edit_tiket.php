@@ -75,13 +75,16 @@ if(isset($_POST['update'])) {
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="dashboard.php">Dashboard</a>
+                        <a class="nav-link active" href="dashboard.php">Dashboard</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="data_tiket.php">Data Tiket</a>
+                        <a class="nav-link" href="data_tiket.php">Data Tiket</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="data_pesanan.php">Data Pesanan</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="konfirmasi-pesanan.php">Konfirmasi Pesanan</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="data_user.php">Data User</a>

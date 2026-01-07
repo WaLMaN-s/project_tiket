@@ -2,7 +2,7 @@
 CREATE DATABASE IF NOT EXISTS `tiket_db` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 USE `tiket_db`;
 
--- Hapus tabel jika sudah ada (untuk fresh install)
+-- Hapus tabel jika sudah ada
 DROP TABLE IF EXISTS `pesanan`;
 DROP TABLE IF EXISTS `tiket`;
 DROP TABLE IF EXISTS `users`;
@@ -36,7 +36,7 @@ CREATE TABLE `tiket` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Tabel pesanan (dengan kolom lengkap untuk alur konfirmasi)
+-- Tabel pesanan
 CREATE TABLE `pesanan` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
@@ -59,22 +59,16 @@ CREATE TABLE `pesanan` (
 
 -- Data default
 INSERT INTO `users` (`id`, `nama`, `email`, `password`, `no_hp`, `role`, `created_at`) VALUES
-(1, 'Admin', 'admin@pentashub.com', '0192023a7bbd73250516f069df18b500', '081234567890', 'admin', '2025-11-11 03:16:48'),
-(2, 'John Doe', 'user@example.com', '6ad14ba9986e3615423dfca256d04e3f', '081298765432', 'user', '2025-11-11 03:16:48'),
-(3, 'FABER WALMAN SITORUS', 'fabersitorus88@gmail.com', '80036d06b5930e4aefd7b8cc3deb16c5', '081266523463', 'user', '2025-11-11 03:30:07');
+(1, 'Admin', 'admin@pentashub.com', MD5('admin123'), '081234567890', 'admin', '2025-11-11 03:16:48'),
+(2, 'John Doe', 'user@example.com', MD5('user123'), '081298765432', 'user', '2025-11-11 03:16:48');
 
-INSERT INTO `tiket` (`id`, `jenis_tiket`, `harga`, `stok`, `deskripsi`, `tanggal_event`, `waktu_event`, `lokasi`, `gambar`, `status`, `created_at`) VALUES
-(4, 'Festival', 50000, 100, 'Tiket Festival memberikan akses ke area penonton umum yang berdiri bebas. Tiket ini menawarkan pengalaman menonton konser dengan suasana meriah di tengah keramaian, cocok untuk penonton yang ingin menikmati energi acara secara langsung.', '2025-12-15', '19:30:00', 'GBK senayan', NULL, 'tersedia', '2025-11-15 06:06:12'),
-(5, 'VIP', 100000, 75, 'Tiket VIP memberikan akses ke area khusus yang lebih dekat ke panggung dengan kapasitas terbatas. Tiket ini menawarkan kenyamanan lebih, ruang yang tidak terlalu padat, serta pengalaman menonton yang lebih eksklusif.', '2025-12-15', '19:30:00', 'GBK senayan', NULL, 'tersedia', '2025-11-15 06:07:15'),
-(6, 'VVIP', 250000, 50, 'Tiket VVIP memberikan akses ke area premium paling dekat dengan panggung. Tiket ini dirancang untuk memberikan pengalaman konser terbaik, dengan fasilitas eksklusif dan kenyamanan maksimal sepanjang acara.', '2025-12-15', '19:30:00', 'GBK senayan', NULL, 'tersedia', '2025-11-15 06:08:26');
+INSERT INTO `tiket` (`id`, `jenis_tiket`, `harga`, `stok`, `deskripsi`, `tanggal_event`, `waktu_event`, `lokasi`, `status`) VALUES
+(1, 'Festival', 50000, 100, 'Tiket Festival memberikan akses ke area penonton umum yang berdiri bebas. Tiket ini menawarkan pengalaman menonton konser dengan suasana meriah di tengah keramaian, cocok untuk penonton yang ingin menikmati energi acara secara langsung.', '2025-12-15', '19:30:00', 'GBK Senayan, Jakarta', 'tersedia'),
+(2, 'VIP', 100000, 75, 'Tiket VIP memberikan akses ke area khusus yang lebih dekat ke panggung dengan kapasitas terbatas. Tiket ini menawarkan kenyamanan lebih, ruang yang tidak terlalu padat, serta pengalaman menonton yang lebih eksklusif.', '2025-12-15', '19:30:00', 'GBK Senayan, Jakarta', 'tersedia'),
+(3, 'VVIP', 250000, 50, 'Tiket VVIP memberikan akses ke area premium paling dekat dengan panggung. Tiket ini dirancang untuk memberikan pengalaman konser terbaik, dengan fasilitas eksklusif dan kenyamanan maksimal sepanjang acara.', '2025-12-15', '19:30:00', 'GBK Senayan, Jakarta', 'tersedia');
 
 -- Set auto-increment
-ALTER TABLE `pesanan`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
-ALTER TABLE `tiket`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
-
-ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+ALTER TABLE `pesanan` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `tiket` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+ALTER TABLE `users` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 COMMIT;

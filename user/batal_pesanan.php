@@ -6,29 +6,44 @@ require_once '../includes/session.php';
 
 requireUser();
 
-$id_pesanan = $_GET['id'];
+if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
+    $_SESSION['error'] = 'ID pesanan tidak valid.';
+    redirect('riwayat.php');
+}
+
+$id_pesanan = (int)$_GET['id'];
 $user_id = $_SESSION['user_id'];
 
-// Cek apakah pesanan milik user ini
-$query = mysqli_query($connt, "SELECT * FROM pesanan WHERE id='$id_pesanan' AND user_id='$user_id'");
+// Cek apakah pesanan milik user ini dan masih bisa dibatalkan
+$stmt = $conn->prepare("SELECT * FROM pesanan WHERE id = ? AND user_id = ? AND status_pesanan = 'menunggu_konfirmasi'");
+$stmt->bind_param("ii", $id_pesanan, $user_id);
+$stmt->execute();
+$pesanan = $stmt->get_result()->fetch_assoc();
 
-if(mysqli_num_rows($query) > 0) {
-    $pesanan = mysqli_fetch_assoc($query);
-    
-    // Update status pesanan menjadi dibatalkan
-    mysqli_query($connt, "UPDATE pesanan SET status_pesanan='dibatalkan' WHERE id='$id_pesanan'");
-    
-    // Kembalikan stok tiket
-    updateStokTiket($pesanan['tiket_id'], $pesanan['jumlah_tiket'], 'tambah');
-    
-    echo "<script>
-        alert('Pesanan berhasil dibatalkan!');
-        window.location.href = 'riwayat.php';
-    </script>";
-} else {
-    echo "<script>
-        alert('Pesanan tidak ditemukan!');
-        window.location.href = 'riwayat.php';
-    </script>";
+if (!$pesanan) {
+    $_SESSION['error'] = 'Pesanan tidak ditemukan atau sudah tidak bisa dibatalkan.';
+    redirect('riwayat.php');
 }
+
+$conn->begin_transaction();
+
+try {
+    // Update status ke dibatalkan
+    $stmt1 = $conn->prepare("UPDATE pesanan SET status_pesanan = 'dibatalkan' WHERE id = ?");
+    $stmt1->bind_param("i", $id_pesanan);
+    $stmt1->execute();
+
+    // Kembalikan stok tiket
+    $stmt2 = $conn->prepare("UPDATE tiket SET stok = stok + ? WHERE id = ?");
+    $stmt2->bind_param("ii", $pesanan['jumlah_tiket'], $pesanan['tiket_id']);
+    $stmt2->execute();
+
+    $conn->commit();
+    $_SESSION['success'] = 'Pesanan berhasil dibatalkan dan stok tiket telah dikembalikan.';
+} catch (Exception $e) {
+    $conn->rollback();
+    $_SESSION['error'] = 'Gagal membatalkan pesanan: ' . $e->getMessage();
+}
+
+redirect('riwayat.php');
 ?>
