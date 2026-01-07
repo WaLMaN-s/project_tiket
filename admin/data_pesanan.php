@@ -71,12 +71,7 @@ $total_pendapatan = $stats['total_pendapatan'] ?? 0;
 
     <div class="dashboard-container" style="margin-top: 80px;">
         <div class="container-fluid">
-            <div class="dashboard-header">
-                <h2>
-                    <i class="fas fa-shopping-cart"></i> Data Pesanan Aktif
-                </h2>
-                <p class="mb-0 text-muted">Menampilkan pesanan yang tidak dibatalkan</p>
-            </div>
+          
 
             <!-- Statistics -->
             <div class="row mb-4">

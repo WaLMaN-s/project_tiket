@@ -5,20 +5,37 @@
     box-sizing: border-box;
 }
 
+:root {
+    --purple-dark: #0f0c29;
+    --purple-mid: #1e1b4b;
+    --purple-light: #312e81;
+    --gradient-primary: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #ec4899 100%);
+    --gradient-vvip: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+    --gradient-vip: linear-gradient(135deg, #16e732 0%, #1774df 100%);
+    --gradient-festival: linear-gradient(135deg, #e2b902 0%, #cc9d1a 100%);
+    --text-primary: #e5e7eb;
+    --text-secondary: #9ca3af;
+    --border-color: rgba(168, 85, 247, 0.3);
+    --shadow-primary: 0 4px 20px rgba(168, 85, 247, 0.3);
+    --shadow-hover: 0 8px 30px rgba(168, 85, 247, 0.6);
+}
+
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
-    color: #e5e7eb;
+    background: linear-gradient(135deg, var(--purple-dark) 0%, #302b63 50%, #24243e 100%);
+    color: var(--text-primary);
     min-height: 100vh;
+    overflow-x: hidden;
 }
 
 /* Navbar */
 .navbar {
     background: rgba(15, 12, 41, 0.98) !important;
-    box-shadow: 0 4px 20px rgba(138, 43, 226, 0.3);
+    box-shadow: var(--shadow-primary);
     padding: 1rem 0;
     backdrop-filter: blur(10px);
     border-bottom: 1px solid rgba(168, 85, 247, 0.2);
+    z-index: 1000;
 }
 
 .navbar-brand {
@@ -31,7 +48,7 @@ body {
 }
 
 .navbar-brand span {
-    background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+    background: var(--gradient-primary);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -54,7 +71,7 @@ body {
     left: 0;
     width: 0;
     height: 2px;
-    background: linear-gradient(90deg, #a855f7, #ec4899);
+    background: var(--gradient-primary);
     transition: width 0.3s ease;
 }
 
@@ -68,7 +85,7 @@ body {
 }
 
 /* ===========================
-   Hero Section dengan Background Image
+   Hero Section
 =========================== */
 .hero-section {
     background-image: linear-gradient(rgba(15, 12, 41, 0.85), rgba(48, 43, 99, 0.85)), 
@@ -85,7 +102,6 @@ body {
     overflow: hidden;
 }
 
-/* Animated particles effect */
 .hero-section::before {
     content: '';
     position: absolute;
@@ -98,7 +114,6 @@ body {
     animation: pulseGlow 6s ease-in-out infinite;
 }
 
-/* Purple glow orbs */
 .hero-section::after {
     content: '';
     position: absolute;
@@ -172,7 +187,7 @@ body {
 
 .hero-date {
     font-size: 1.8rem;
-    background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+    background: var(--gradient-primary);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -199,13 +214,13 @@ body {
    Buttons
 =========================== */
 .btn-custom {
-    background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #ec4899 100%);
+    background: var(--gradient-primary);
     border: none;
     color: #ffffff;
     font-weight: 700;
     padding: 15px 40px;
     font-size: 1.1rem;
-    box-shadow: 0 4px 20px rgba(168, 85, 247, 0.4);
+    box-shadow: var(--shadow-primary);
     transition: all 0.3s ease;
     text-transform: uppercase;
     letter-spacing: 2px;
@@ -232,60 +247,103 @@ body {
 .btn-custom:hover {
     background: linear-gradient(135deg, #a855f7 0%, #ec4899 50%, #8b5cf6 100%);
     transform: translateY(-3px);
-    box-shadow: 0 8px 30px rgba(168, 85, 247, 0.6);
+    box-shadow: var(--shadow-hover);
     color: #ffffff;
 }
 
 .btn-book {
     background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
-    border: none;
-    color: #ffffff;
+    color: white;
     font-weight: 700;
-    text-shadow: none;
-    box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
-    transition: all 0.3s ease;
-    display: inline-block;
-    width: 100%;
-    padding: 12px 15px;
+    padding: 12px;
     border-radius: 10px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-}
-
-.btn-book::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transition: left 0.5s ease;
-}
-
-.btn-book:hover::before {
-    left: 100%;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
+    border: none;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .btn-book:hover {
     background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(236, 72, 153, 0.5);
-    color: #ffffff;
+}
+
+/* Primary Action Buttons */
+.btn-primary {
+    background: var(--gradient-primary) !important;
+    border: none !important;
+    color: white !important;
+    font-weight: 600;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover) !important;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    border: none !important;
+    color: white !important;
+    font-weight: 600;
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(16, 185, 129, 0.4) !important;
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+    border: none !important;
+    color: white !important;
+    font-weight: 600;
+}
+
+.btn-danger:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(239, 68, 68, 0.4) !important;
+}
+
+.btn-secondary {
+    background: rgba(75, 85, 99, 0.7) !important;
+    border: none !important;
+    color: white !important;
+    font-weight: 600;
+}
+
+.btn-secondary:hover {
+    background: rgba(55, 65, 81, 0.9) !important;
+    transform: translateY(-2px);
+}
+
+/* Small Action Buttons */
+.btn-sm {
+    padding: 6px 12px !important;
+    font-size: 0.85rem !important;
+    border-radius: 8px !important;
+    transition: all 0.2s ease !important;
+    margin: 2px !important;
+}
+
+.btn-sm i {
+    margin-right: 4px !important;
 }
 
 /* ===========================
    Tickets Section
 =========================== */
 .ticket-section {
-    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #1f2937 100%);
+    background: linear-gradient(135deg, var(--purple-mid) 0%, var(--purple-light) 50%, #1f2937 100%);
     padding: 80px 0;
     position: relative;
     overflow: hidden;
 }
 
-/* Animated background pattern */
 .ticket-section::before {
     content: '';
     position: absolute;
@@ -303,7 +361,6 @@ body {
     to { background-position: 100px 100px; }
 }
 
-/* Purple glow effect */
 .ticket-section::after {
     content: '';
     position: absolute;
@@ -344,8 +401,8 @@ body {
 .ticket-card {
     position: relative;
     z-index: 1;
-    background: linear-gradient(145deg, rgba(30, 27, 75, 0.9) 0%, rgba(49, 46, 129, 0.8) 100%);
-    border: 2px solid rgba(168, 85, 247, 0.3);
+    background: rgba(30, 27, 75, 0.85);
+    border: 2px solid var(--border-color);
     border-radius: 20px;
     padding: 30px;
     margin-bottom: 30px;
@@ -365,7 +422,7 @@ body {
     bottom: 0;
     border-radius: 20px;
     padding: 2px;
-    background: linear-gradient(135deg, #a855f7, #ec4899);
+    background: var(--gradient-primary);
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
@@ -390,11 +447,9 @@ body {
     margin-bottom: 15px;
 }
 
-/* Badge colors - Purple Theme */
-
-/* VVIP - Golden Purple */
+/* Badge colors - Fixed */
 .badge-vvip {
-    background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+    background: var(--gradient-vvip);
     color: #ffffff;
     font-weight: 800;
     padding: 8px 16px;
@@ -402,34 +457,35 @@ body {
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
     display: inline-block;
+    font-size: 1.1rem;
 }
 
-/* VIP - Deep Purple */
 .badge-vip {
-    background: linear-gradient(135deg, #16e732 0%, #1774df 100%);
+    background: var(--gradient-vip);
     color: #ffffff;
     font-weight: 800;
     padding: 8px 16px;
     border-radius: 10px;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);
+    box-shadow: 0 4px 15px rgba(22, 231, 50, 0.4);
     display: inline-block;
+    font-size: 1.1rem;
 }
 
-/* Festival - Violet */
 .badge-festival {
-    background: linear-gradient(135deg, #e2b902 0%, #cc9d1a 100%);
+    background: var(--gradient-festival);
     color: #ffffff;
     font-weight: 800;
     padding: 8px 16px;
     border-radius: 10px;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+    box-shadow: 0 4px 15px rgba(226, 185, 2, 0.4);
     display: inline-block;
+    font-size: 1.1rem;
 }
 
 .ticket-desc {
-    color: #d1d5db;
+    color: var(--text-secondary);
     line-height: 1.8;
     font-size: 0.95rem;
     margin-bottom: 20px;
@@ -439,7 +495,7 @@ body {
 .ticket-info {
     display: flex;
     justify-content: space-between;
-    color: #e5e7eb;
+    color: var(--text-primary);
     font-size: 0.9rem;
     margin-bottom: 10px;
     padding: 8px 0;
@@ -451,8 +507,31 @@ body {
     filter: drop-shadow(0 0 6px rgba(168, 85, 247, 0.5));
 }
 
+.ticket-price {
+    font-size: 2.5rem;
+    font-weight: bold;
+    background: linear-gradient(135deg, #ffcc00 0%, #ff9900 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 15px 0;
+    text-shadow: 0 0 15px rgba(255, 204, 0, 0.5);
+}
+
+.stok-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(0, 0, 0, 0.7);
+    color: #10b981;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+    border: 1px solid #10b981;
+}
+
 /* ===========================
-   Login/Register Form
+   Forms & Auth
 =========================== */
 .auth-container {
     min-height: 100vh;
@@ -463,8 +542,8 @@ body {
 }
 
 .auth-card {
-    background: linear-gradient(145deg, rgba(30, 27, 75, 0.95) 0%, rgba(49, 46, 129, 0.9) 100%);
-    border: 2px solid rgba(168, 85, 247, 0.3);
+    background: rgba(30, 27, 75, 0.95);
+    border: 2px solid var(--border-color);
     border-radius: 20px;
     padding: 40px;
     max-width: 500px;
@@ -478,7 +557,7 @@ body {
     text-align: center;
     font-size: 2.5rem;
     margin-bottom: 2rem;
-    background: linear-gradient(135deg, #c084fc 0%, #ec4899 100%);
+    background: var(--gradient-primary);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -489,8 +568,8 @@ body {
 
 .form-control {
     background: rgba(30, 27, 75, 0.6);
-    border: 1px solid rgba(168, 85, 247, 0.3);
-    color: #e5e7eb;
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
     padding: 12px;
     border-radius: 10px;
     margin-bottom: 20px;
@@ -509,22 +588,24 @@ body {
     color: rgba(229, 231, 235, 0.5);
 }
 
-/* ===========================
-   Dashboard
-=========================== */
-.dashboard-container {
-    padding: 40px 0;
-    min-height: 100vh;
+.form-label {
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #c084fc;
 }
 
+/* ===========================
+   Dashboard Common Styles
+=========================== */
+.dashboard-container,
 .dashboard-admin {
-    padding: 40px 0;
+    padding: 20px 0;
     min-height: 100vh;
 }
 
 .dashboard-header {
-    background: linear-gradient(145deg, rgba(30, 27, 75, 0.95) 0%, rgba(49, 46, 129, 0.9) 100%);
-    border: 2px solid rgba(168, 85, 247, 0.3);
+    background: rgba(30, 27, 75, 0.95);
+    border: 2px solid var(--border-color);
     border-radius: 20px;
     padding: 30px;
     margin-bottom: 30px;
@@ -533,13 +614,14 @@ body {
 }
 
 .card-custom {
-    background: linear-gradient(145deg, rgba(30, 27, 75, 0.95) 0%, rgba(49, 46, 129, 0.9) 100%);
-    border: 2px solid rgba(168, 85, 247, 0.3);
+    background: rgba(30, 27, 75, 0.95);
+    border: 2px solid var(--border-color);
     border-radius: 15px;
-    padding: 20px;
-    margin-bottom: 20px;
+    padding: 25px;
+    margin-bottom: 25px;
     transition: all 0.3s ease;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(5px);
 }
 
 .card-custom:hover {
@@ -548,110 +630,291 @@ body {
     border-color: rgba(168, 85, 247, 0.5);
 }
 
-/* ===========================
-   Table
-=========================== */
-.table-custom {
-    background: rgba(30, 27, 75, 0.95);
+.card-custom h2,
+.card-custom h3,
+.card-custom h4 {
+    margin-bottom: 20px;
+    color: #c084fc;
+    position: relative;
+    padding-bottom: 10px;
+}
+
+.card-custom h2::after,
+.card-custom h3::after,
+.card-custom h4::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 50px;
+    height: 3px;
+    background: var(--gradient-primary);
+    border-radius: 3px;
+}
+
+/* Stats Cards */
+.stats-card {
+    text-align: center;
+    padding: 25px;
     border-radius: 15px;
-    overflow: hidden;
-    color: #e5e7eb;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    background: rgba(30, 27, 75, 0.8);
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
 }
 
-.table-custom thead {
-    background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+.stats-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(168, 85, 247, 0.6);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
 }
 
-.table-custom thead th {
-    color: #000000;
+.stats-card h4 {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+}
+
+.stats-card .number {
+    font-size: 2.8rem;
+    font-weight: 800;
+    margin: 10px 0;
+}
+
+.stats-card .description {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+/* Ticket Type Colors */
+.stats-card.tickets {
+    border-left: 4px solid #a855f7;
+}
+
+.stats-card.users {
+    border-left: 4px solid #3b82f6;
+}
+
+.stats-card.orders {
+    border-left: 4px solid #ec4899;
+}
+
+.stats-card.revenue {
+    border-left: 4px solid #fbbf24;
+}
+
+.stats-card.tickets .number { color: #a855f7; }
+.stats-card.users .number { color: #3b82f6; }
+.stats-card.orders .number { color: #ec4899; }
+.stats-card.revenue .number { color: #fbbf24; }
+
+/* ===========================
+   Tables
+=========================== */
+.table-container {
+    overflow-x: auto;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    background: rgba(30, 27, 75, 0.9);
+    border: 1px solid var(--border-color);
+}
+
+.table {
+    min-width: 100%;
+    color: var(--text-primary);
+    border-collapse: collapse;
+}
+
+.table thead {
+    background: rgba(139, 92, 246, 0.2);
+    backdrop-filter: blur(5px);
+}
+
+.table thead th {
+    padding: 15px 12px;
     font-weight: 700;
-    border: none;
     text-transform: uppercase;
     letter-spacing: 1px;
-    padding: 15px 12px;
+    color: #c084fc;
+    border-bottom: 2px solid rgba(168, 85, 247, 0.5);
 }
 
-.table-custom tbody tr {
-    border-bottom: 1px solid rgba(168, 85, 247, 0.2);
+.table tbody tr {
+    border-bottom: 1px solid rgba(168, 85, 247, 0.1);
     transition: all 0.2s ease;
 }
 
-.table-custom tbody tr:hover {
-    background: rgba(168, 85, 247, 0.15);
+.table tbody tr:hover {
+    background: rgba(168, 85, 247, 0.1);
+    transform: translateY(-2px);
 }
 
-.table-custom td, .table-custom th {
-    color: #000000;
-    padding: 12px;
+.table td, .table th {
+    padding: 12px 15px;
+    vertical-align: middle;
 }
 
-.table-custom tbody {
-    background: rgba(30, 27, 75, 0.8);
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(45, 41, 100, 0.3);
 }
 
-/* Empty state text */
-.text-center h4 {
-    color: #d1d5db !important;
+.status-badge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.85rem;
 }
 
-.text-muted {
-    color: #9ca3af !important;
+.status-menunggu_konfirmasi {
+    background: rgba(251, 191, 36, 0.2);
+    color: #fbbf24;
+    border: 1px solid rgba(251, 191, 36, 0.4);
+}
+
+.status-dikonfirmasi {
+    background: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+.status-dibatalkan {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.4);
 }
 
 /* ===========================
-   Action Buttons (Edit & Delete)
+   Payment & Confirmation Pages
 =========================== */
-.btn-sm {
-    padding: 8px 16px;
-    font-size: 0.875rem;
-    border-radius: 8px;
-    font-weight: 600;
+.payment-method {
+    border: 2px solid var(--border-color);
+    border-radius: 15px;
+    padding: 25px;
+    text-align: center;
+    cursor: pointer;
     transition: all 0.3s ease;
+    margin-bottom: 20px;
+    background: rgba(30, 27, 75, 0.6);
+}
+
+.payment-method:hover {
+    transform: translateY(-5px);
+    border-color: #c084fc;
+    box-shadow: 0 8px 25px rgba(168, 85, 247, 0.3);
+}
+
+.payment-method.selected {
+    border-color: #a855f7;
+    background: rgba(139, 92, 246, 0.15);
+    box-shadow: 0 0 25px rgba(168, 85, 247, 0.3);
+    transform: scale(1.02);
+}
+
+.payment-icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+}
+
+.payment-icon.qris { color: #a855f7; }
+.payment-icon.transfer { color: #3b82f6; }
+
+.payment-details {
+    background: rgba(30, 27, 75, 0.7);
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px 0;
+}
+
+.payment-details ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.payment-details li {
+    padding: 8px 0;
+    border-bottom: 1px dashed rgba(168, 85, 247, 0.3);
+}
+
+.payment-details li:last-child {
+    border-bottom: none;
+}
+
+.payment-details strong {
+    color: #c084fc;
+}
+
+/* ===========================
+   Admin Specific Styles
+=========================== */
+.admin-sidebar {
+    background: rgba(15, 12, 41, 0.95);
+    border-right: 1px solid var(--border-color);
+    height: calc(100vh - 70px);
+    position: fixed;
+    width: 280px;
+    overflow-y: auto;
+    z-index: 999;
+}
+
+.admin-main {
+    margin-left: 280px;
+    padding: 20px;
+}
+
+.admin-nav-link {
+    display: block;
+    padding: 12px 20px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    border-radius: 8px;
+    margin: 5px 10px;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.admin-nav-link i {
+    margin-right: 10px;
+    width: 20px;
+    text-align: center;
+}
+
+.admin-nav-link:hover,
+.admin-nav-link.active {
+    color: white;
+    background: rgba(168, 85, 247, 0.2);
+}
+
+.admin-nav-link.active {
+    background: rgba(139, 92, 246, 0.3);
+    border-left: 4px solid #a855f7;
+}
+
+/* ===========================
+   Alerts & Notifications
+=========================== */
+.alert {
+    border-radius: 10px;
+    padding: 15px 20px;
+    margin-bottom: 20px;
     border: none;
-    margin: 0 3px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
+    backdrop-filter: blur(5px);
 }
 
-.btn-warning {
-    background: linear-gradient(135deg, #d7ff48 0%, #ecc048 100%);
-    color: #ffffff;
+.alert-success {
+    background: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+    border-left: 4px solid #10b981;
 }
 
-.btn-warning:hover {
-    background: linear-gradient(135deg, #c73713 0%, #d4943f 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(226, 152, 14, 0.5);
-    color: #ffffff;
+.alert-danger {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    border-left: 4px solid #ef4444;
 }
 
-.btn-warning::after {
-    content: 'Edit';
-    font-weight: 600;
-}
-
-.btn-danger {
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-    color: #ffffff;
-}
-
-.btn-danger:hover {
-    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.5);
-    color: #ffffff;
-}
-
-.btn-danger::after {
-    content: 'Delete';
-    font-weight: 600;
-}
-
-.btn-sm i {
-    margin: 0;
+.alert-info {
+    background: rgba(59, 130, 246, 0.2);
+    color: #3b82f6;
+    border-left: 4px solid #3b82f6;
 }
 
 /* ===========================
@@ -663,11 +926,12 @@ body {
     text-align: center;
     border-top: 2px solid rgba(168, 85, 247, 0.3);
     box-shadow: 0 -4px 20px rgba(168, 85, 247, 0.2);
+    margin-top: 50px;
 }
 
 .footer p {
     margin: 0;
-    color: #d1d5db;
+    color: var(--text-secondary);
 }
 
 /* ===========================
@@ -678,12 +942,14 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-    background: rgba(15, 12, 41, 0.5);
+    background: rgba(15, 12, 41, 0.7);
+    border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb {
     background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
     border-radius: 5px;
+    border: 2px solid rgba(15, 12, 41, 0.5);
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -691,46 +957,170 @@ body {
 }
 
 /* ===========================
-   Responsive
+   Responsive Design
 =========================== */
+@media (max-width: 991px) {
+    .admin-sidebar {
+        width: 230px;
+    }
+    
+    .admin-main {
+        margin-left: 230px;
+    }
+}
+
 @media (max-width: 768px) {
     /* Disable parallax on mobile for better performance */
     .hero-section {
         background-attachment: scroll;
+        min-height: 80vh;
     }
     
     .hero-title {
-        font-size: 2.5rem;
+        font-size: 2.8rem;
         letter-spacing: 5px;
     }
     
     .hero-subtitle {
-        font-size: 1.5rem;
+        font-size: 1.8rem;
         letter-spacing: 4px;
     }
     
     .hero-date {
-        font-size: 1.3rem;
-    }
-    
-    .hero-info {
-        font-size: 1rem;
+        font-size: 1.4rem;
     }
     
     .section-title {
-        font-size: 2rem;
+        font-size: 2.2rem;
     }
     
     .btn-custom {
-        padding: 12px 30px;
-        font-size: 1rem;
+        padding: 12px 25px;
+        font-size: 0.95rem;
     }
     
     .ticket-card {
-        padding: 20px;
+        padding: 20px 15px;
     }
     
     .navbar-brand {
         font-size: 1.5rem;
     }
+    
+    .navbar-nav {
+        margin-top: 10px;
+    }
+    
+    .admin-sidebar {
+        position: fixed;
+        left: -280px;
+        height: 100vh;
+        z-index: 1000;
+        transition: left 0.3s ease;
+    }
+    
+    .admin-sidebar.show {
+        left: 0;
+    }
+    
+    .admin-main {
+        margin-left: 0;
+    }
+    
+    .menu-toggle {
+        display: block !important;
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        z-index: 1001;
+        background: rgba(139, 92, 246, 0.2);
+        border: 1px solid rgba(168, 85, 247, 0.5);
+        color: white;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+    }
 }
+
+@media (max-width: 576px) {
+    .hero-title {
+        font-size: 2.2rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.4rem;
+    }
+    
+    .section-title {
+        font-size: 1.8rem;
+    }
+    
+    .ticket-card {
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .card-custom {
+        padding: 15px;
+    }
+    
+    .auth-card {
+        padding: 25px 20px;
+    }
+    
+    .dashboard-header {
+        padding: 20px 15px;
+    }
+}
+
+/* Custom utilities */
+.text-purple {
+    color: #c084fc !important;
+}
+
+.bg-purple-dark {
+    background: rgba(30, 27, 75, 0.9) !important;
+}
+
+.border-purple {
+    border-color: rgba(168, 85, 247, 0.5) !important;
+}
+
+.shadow-purple {
+    box-shadow: 0 4px 20px rgba(168, 85, 247, 0.3) !important;
+}
+
+/* Animation Utilities */
+.fade-in {
+    animation: fadeIn 0.5s ease forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.stagger-item {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUpStagger 0.6s ease forwards;
+}
+
+@keyframes fadeInUpStagger {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Add stagger delay */
+.stagger-item:nth-child(1) { animation-delay: 0.1s; }
+.stagger-item:nth-child(2) { animation-delay: 0.2s; }
+.stagger-item:nth-child(3) { animation-delay: 0.3s; }
+.stagger-item:nth-child(4) { animation-delay: 0.4s; }

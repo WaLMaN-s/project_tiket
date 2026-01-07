@@ -1,4 +1,9 @@
 <?php
+// AKTIFKAN ERROR REPORTING UNTUK DEBUGGING
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 session_start();
 require_once '../includes/config.php';
 require_once '../includes/functions.php';
@@ -26,7 +31,6 @@ if(!$tiket) {
 
 $user_data = getUserData();
 $error = '';
-$success = '';
 
 if(isset($_POST['pesan'])) {
     $jumlah_tiket = (int)$_POST['jumlah_tiket'];
@@ -40,31 +44,30 @@ if(isset($_POST['pesan'])) {
     } elseif($jumlah_tiket > $tiket['stok']) {
         $error = 'Stok tiket tidak mencukupi!';
     } else {
-        $total_harga = $jumlah_tiket * $tiket['harga'];
-        $user_id = $_SESSION['user_id'];
+        // Debug: cek apakah sampai di sini
+        error_log("Form submitted successfully");
+
+        // Simpan data sementara ke session
+        $_SESSION['temp_order'] = [
+            'tiket_id' => $id_tiket,
+            'jumlah_tiket' => $jumlah_tiket,
+            'nama_pemesan' => $nama_pemesan,
+            'email_pemesan' => $email_pemesan,
+            'no_hp_pemesan' => $no_hp_pemesan,
+            'total_harga' => $jumlah_tiket * $tiket['harga'],
+            'jenis_tiket' => $tiket['jenis_tiket']
+        ];
+
+        // Debug: cek session
+        error_log("Session data set: " . print_r($_SESSION['temp_order'], true));
+
+        // PERBAIKAN UTAMA: pastikan tidak ada output sebelum redirect
+        ob_clean(); // Bersihkan output buffer
+        flush();    // Flush output buffer
         
-        // Insert pesanan dengan prepared statement
-        $stmt_insert = $conn->prepare("INSERT INTO pesanan 
-            (user_id, tiket_id, jumlah_tiket, total_harga, nama_pemesan, email_pemesan, no_hp_pemesan, status_pesanan) 
-            VALUES 
-            (?, ?, ?, ?, ?, ?, ?, 'berhasil')");
-        
-        $stmt_insert->bind_param("iiidsss", $user_id, $id_tiket, $jumlah_tiket, $total_harga, 
-                                   $nama_pemesan, $email_pemesan, $no_hp_pemesan);
-        
-        if($stmt_insert->execute()) {
-            // Update stok tiket
-            updateStokTiket($id_tiket, $jumlah_tiket, 'kurang');
-            
-            $success = 'Pemesanan tiket berhasil!';
-            echo "<script>
-                setTimeout(function() {
-                    window.location.href = 'riwayat.php';
-                }, 2000);
-            </script>";
-        } else {
-            $error = 'Pemesanan gagal! ' . $conn->error;
-        }
+        // Redirect ke halaman metode pembayaran
+        redirect('metode-pembayaran.php');
+        exit(); // Pastikan script berhenti di sini
     }
 }
 ?>
@@ -114,61 +117,63 @@ if(isset($_POST['pesan'])) {
             </a>
 
             <?php if($error): ?>
-                <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
-            <?php endif; ?>
-
-            <?php if($success): ?>
-                <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
+                <div class="alert alert-danger alert-dismissible fade show">
+                    <?= htmlspecialchars($error) ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
             <?php endif; ?>
 
             <div class="row">
                 <div class="col-md-8">
                     <div class="card-custom">
-                        <h2 class="mb-4" style="color: #8b00ff;">
-                            <i class="fas fa-shopping-cart"></i> Form Pemesanan Tiket
+                        <h2 class="mb-4 text-purple">
+                            <i class="fas fa-shopping-cart me-2"></i> Form Pemesanan Tiket
                         </h2>
 
-                        <form method="POST" action="" id="formPesan">
+                        <form method="POST" action="">
                             <div class="mb-3">
-                                <label class="form-label">Nama Pemesan</label>
-                                <input type="text" name="nama_pemesan" class="form-control" 
+                                <label class="form-label fw-bold">Nama Pemesan</label>
+                                <input type="text" name="nama_pemesan" class="form-control bg-purple-dark border-purple text-white" 
                                        value="<?= htmlspecialchars($user_data['nama']) ?>" required>
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label">Email Pemesan</label>
-                                <input type="email" name="email_pemesan" class="form-control" 
+                                <label class="form-label fw-bold">Email Pemesan</label>
+                                <input type="email" name="email_pemesan" class="form-control bg-purple-dark border-purple text-white" 
                                        value="<?= htmlspecialchars($user_data['email']) ?>" required>
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label">No. HP Pemesan</label>
-                                <input type="text" name="no_hp_pemesan" class="form-control" 
+                                <label class="form-label fw-bold">No. HP Pemesan</label>
+                                <input type="text" name="no_hp_pemesan" class="form-control bg-purple-dark border-purple text-white" 
                                        value="<?= htmlspecialchars($user_data['no_hp']) ?>" required>
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label">Jumlah Tiket (Maks: <?= $tiket['stok'] ?>)</label>
+                                <label class="form-label fw-bold">Jumlah Tiket (Maks: <?= $tiket['stok'] ?>)</label>
                                 <input type="number" name="jumlah_tiket" id="jumlah_tiket" 
-                                       class="form-control" min="1" max="<?= $tiket['stok'] ?>" 
+                                       class="form-control bg-purple-dark border-purple text-white" min="1" max="<?= $tiket['stok'] ?>" 
                                        value="1" required onchange="hitungTotal()">
                             </div>
 
-                            <button type="submit" name="pesan" class="btn btn-custom w-100">
-                                <i class="fas fa-check"></i> KONFIRMASI PEMESANAN
+                            <button type="submit" name="pesan" class="btn btn-custom w-100 py-3">
+                                <i class="fas fa-arrow-right me-2"></i> LANJUT KE PEMBAYARAN
                             </button>
+                            <div class="text-center mt-2 text-muted small">
+                                <i class="fas fa-info-circle me-1"></i> Setelah klik, Anda akan diarahkan ke halaman pembayaran
+                            </div>
                         </form>
                     </div>
                 </div>
 
                 <div class="col-md-4">
                     <div class="card-custom">
-                        <h4 class="mb-3" style="color: #8b00ff;">
-                            <i class="fas fa-receipt"></i> Ringkasan Pesanan
+                        <h4 class="mb-3 text-purple">
+                            <i class="fas fa-receipt me-2"></i> Ringkasan Pesanan
                         </h4>
 
                         <div class="mb-3">
-                            <strong>Jenis Tiket:</strong><br>
+                            <strong class="d-block mb-2">Jenis Tiket:</strong>
                             <span class="ticket-type">
                                 <?php if($tiket['jenis_tiket'] == 'VVIP'): ?>
                                     <span class="badge-vvip"><?= htmlspecialchars($tiket['jenis_tiket']) ?></span>
@@ -181,39 +186,43 @@ if(isset($_POST['pesan'])) {
                         </div>
 
                         <div class="mb-3">
-                            <strong>Harga per Tiket:</strong><br>
-                            <span style="color: #8b00ff; font-size: 1.2rem;">
+                            <strong class="d-block mb-2">Harga per Tiket:</strong>
+                            <span class="text-warning fs-4 fw-bold">
                                 <?= formatRupiah($tiket['harga']) ?>
                             </span>
                         </div>
 
                         <div class="mb-3">
-                            <strong>Tanggal Event:</strong><br>
+                            <strong class="d-block mb-2">Tanggal Event:</strong>
                             <?= formatTanggal($tiket['tanggal_event']) ?>
                         </div>
 
                         <div class="mb-3">
-                            <strong>Waktu:</strong><br>
+                            <strong class="d-block mb-2">Waktu:</strong>
                             <?= formatWaktu($tiket['waktu_event']) ?>
                         </div>
 
                         <div class="mb-3">
-                            <strong>Lokasi:</strong><br>
+                            <strong class="d-block mb-2">Lokasi:</strong>
                             <?= htmlspecialchars($tiket['lokasi']) ?>
                         </div>
 
-                        <hr style="border-color: #8b00ff;">
+                        <hr class="border-purple my-4">
 
-                        <div class="mb-2">
-                            <strong>Jumlah Tiket:</strong>
-                            <span id="display_jumlah" class="float-end">1</span>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <strong class="text-purple">Jumlah Tiket:</strong>
+                                <span id="display_jumlah" class="text-white fw-bold fs-4">1</span>
+                            </div>
                         </div>
 
                         <div class="mb-3">
-                            <strong>Total Harga:</strong>
-                            <h4 id="total_harga" class="float-end" style="color: #00ff00;">
-                                <?= formatRupiah($tiket['harga']) ?>
-                            </h4>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <strong class="text-purple">Total Harga:</strong>
+                                <h4 id="total_harga" class="text-warning mb-0 fw-bold fs-2">
+                                    <?= formatRupiah($tiket['harga']) ?>
+                                </h4>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -236,6 +245,24 @@ if(isset($_POST['pesan'])) {
             document.getElementById('display_jumlah').textContent = jumlah;
             document.getElementById('total_harga').textContent = formatRupiah(total);
         }
+        
+        // Trigger initial calculation
+        document.addEventListener('DOMContentLoaded', function() {
+            hitungTotal();
+        });
+
+        // Tambahkan event listener untuk form submission
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Mengarahkan...';
+            
+            // Kembalikan tombol setelah 3 detik jika redirect gagal
+            setTimeout(function() {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-arrow-right me-2"></i> LANJUT KE PEMBAYARAN';
+            }, 3000);
+        });
     </script>
 </body>
 </html>

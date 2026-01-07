@@ -19,9 +19,9 @@ if(!$tiket) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detail Tiket - PENTAS.HUB</title>
+    <title>Pesan Tiket - PENTAS.HUB</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -59,76 +59,108 @@ if(!$tiket) {
                 <i class="fas fa-arrow-left"></i> Kembali
             </a>
 
+            <?php if($error): ?>
+                <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
+            <?php endif; ?>
+
+            <?php if($success): ?>
+                <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
+            <?php endif; ?>
+
             <div class="row">
-                <div class="col-md-8 mx-auto">
+                <div class="col-md-8">
                     <div class="card-custom">
                         <h2 class="mb-4" style="color: #8b00ff;">
-                            <i class="fas fa-ticket-alt"></i> Detail Tiket
+                            <i class="fas fa-shopping-cart"></i> Form Pemesanan Tiket
                         </h2>
 
-                        <div class="ticket-type mb-4">
-                            <?php if($tiket['jenis_tiket'] == 'VVIP'): ?>
-                                <span class="badge-vvip" style="font-size: 1.5rem;"><?= $tiket['jenis_tiket'] ?></span>
-                            <?php elseif($tiket['jenis_tiket'] == 'VIP'): ?>
-                                <span class="badge-vip" style="font-size: 1.5rem;"><?= $tiket['jenis_tiket'] ?></span>
-                            <?php else: ?>
-                                <span class="badge-festival" style="font-size: 1.5rem;"><?= $tiket['jenis_tiket'] ?></span>
-                            <?php endif; ?>
+                        <form method="POST" action="" id="formPesan">
+                            <div class="mb-3">
+                                <label class="form-label">Nama Pemesan</label>
+                                <input type="text" name="nama_pemesan" class="form-control" 
+                                       value="<?= htmlspecialchars($user_data['nama']) ?>" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Email Pemesan</label>
+                                <input type="email" name="email_pemesan" class="form-control" 
+                                       value="<?= htmlspecialchars($user_data['email']) ?>" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">No. HP Pemesan</label>
+                                <input type="text" name="no_hp_pemesan" class="form-control" 
+                                       value="<?= htmlspecialchars($user_data['no_hp']) ?>" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Jumlah Tiket (Maks: <?= $tiket['stok'] ?>)</label>
+                                <input type="number" name="jumlah_tiket" id="jumlah_tiket" 
+                                       class="form-control" min="1" max="<?= $tiket['stok'] ?>" 
+                                       value="1" required onchange="hitungTotal()">
+                            </div>
+
+                            <button type="submit" name="pesan" class="btn btn-custom w-100">
+                                <i class="fas fa-check"></i> KONFIRMASI PEMESANAN
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card-custom">
+                        <h4 class="mb-3" style="color: #8b00ff;">
+                            <i class="fas fa-receipt"></i> Ringkasan Pesanan
+                        </h4>
+
+                        <div class="mb-3">
+                            <strong>Jenis Tiket:</strong><br>
+                            <span class="ticket-type">
+                                <?php if($tiket['jenis_tiket'] == 'VVIP'): ?>
+                                    <span class="badge-vvip"><?= htmlspecialchars($tiket['jenis_tiket']) ?></span>
+                                <?php elseif($tiket['jenis_tiket'] == 'VIP'): ?>
+                                    <span class="badge-vip"><?= htmlspecialchars($tiket['jenis_tiket']) ?></span>
+                                <?php else: ?>
+                                    <span class="badge-festival"><?= htmlspecialchars($tiket['jenis_tiket']) ?></span>
+                                <?php endif; ?>
+                            </span>
                         </div>
 
-                        <h3 class="ticket-price mb-4"><?= formatRupiah($tiket['harga']) ?></h3>
-
-                        <div class="mb-4">
-                            <h5><i class="fas fa-info-circle"></i> Deskripsi:</h5>
-                            <p style="color: #ccc; line-height: 1.8;">
-                                <?= nl2br($tiket['deskripsi']) ?>
-                            </p>
+                        <div class="mb-3">
+                            <strong>Harga per Tiket:</strong><br>
+                            <span style="color: #8b00ff; font-size: 1.2rem;">
+                                <?= formatRupiah($tiket['harga']) ?>
+                            </span>
                         </div>
 
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <div class="ticket-info mb-3">
-                                    <div>
-                                        <i class="fas fa-calendar"></i> Tanggal Event
-                                    </div>
-                                    <div>
-                                        <strong><?= formatTanggal($tiket['tanggal_event']) ?></strong>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="ticket-info mb-3">
-                                    <div>
-                                        <i class="fas fa-clock"></i> Waktu Event
-                                    </div>
-                                    <div>
-                                        <strong><?= formatWaktu($tiket['waktu_event']) ?></strong>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="mb-3">
+                            <strong>Tanggal Event:</strong><br>
+                            <?= formatTanggal($tiket['tanggal_event']) ?>
                         </div>
 
-                        <div class="ticket-info mb-4">
-                            <div>
-                                <i class="fas fa-map-marker-alt"></i> Lokasi
-                            </div>
-                            <div>
-                                <strong><?= $tiket['lokasi'] ?></strong>
-                            </div>
+                        <div class="mb-3">
+                            <strong>Waktu:</strong><br>
+                            <?= formatWaktu($tiket['waktu_event']) ?>
                         </div>
 
-                        <div class="ticket-info mb-4">
-                            <div>
-                                <i class="fas fa-ticket-alt"></i> Stok Tersedia
-                            </div>
-                            <div>
-                                <strong style="color: #00ff00;"><?= $tiket['stok'] ?> tiket</strong>
-                            </div>
+                        <div class="mb-3">
+                            <strong>Lokasi:</strong><br>
+                            <?= htmlspecialchars($tiket['lokasi']) ?>
                         </div>
 
-                        <a href="pesan_tiket.php?id=<?= $tiket['id'] ?>" class="btn btn-custom w-100 btn-lg">
-                            <i class="fas fa-shopping-cart"></i> LANJUT PESAN
-                        </a>
+                        <hr style="border-color: #8b00ff;">
+
+                        <div class="mb-2">
+                            <strong>Jumlah Tiket:</strong>
+                            <span id="display_jumlah" class="float-end">1</span>
+                        </div>
+
+                        <div class="mb-3">
+                            <strong>Total Harga:</strong>
+                            <h4 id="total_harga" class="float-end" style="color: #00ff00;">
+                                <?= formatRupiah($tiket['harga']) ?>
+                            </h4>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -136,5 +168,20 @@ if(!$tiket) {
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const hargaSatuan = <?= $tiket['harga'] ?>;
+        
+        function formatRupiah(angka) {
+            return 'Rp ' + angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+        
+        function hitungTotal() {
+            const jumlah = parseInt(document.getElementById('jumlah_tiket').value) || 0;
+            const total = jumlah * hargaSatuan;
+            
+            document.getElementById('display_jumlah').textContent = jumlah;
+            document.getElementById('total_harga').textContent = formatRupiah(total);
+        }
+    </script>
 </body>
 </html>

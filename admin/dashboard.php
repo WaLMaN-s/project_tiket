@@ -71,6 +71,9 @@ $result_pesanan = $stmt_list->get_result();
                         <a class="nav-link" href="data_tiket.php">Data Tiket</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="konfirmasi_pesanan.php">konfirmasi pesanan</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="data_pesanan.php">Data Pesanan</a>
                     </li>
                     <li class="nav-item">
