@@ -179,7 +179,9 @@ function confirmDelete(message = 'Apakah Anda yakin ingin menghapus data ini?') 
     return confirm(message);
 }
 
+
 // Console log untuk debugging (remove in production)
 console.log('PENTAS.HUB Website Loaded Successfully!');
 console.log('Event Date: 29 November 2025');
 console.log('Venue: GBK Senayan, Jakarta');
+

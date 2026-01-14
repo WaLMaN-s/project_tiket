@@ -58,7 +58,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 $_SESSION['temp_order']['metode'] = $metode;
                 $_SESSION['temp_order']['bukti'] = $filename;
-                // Jangan redirect dulu, tampilkan preview
             } else {
                 $error .= 'Gagal memindahkan file. Periksa permission folder.<br>';
                 $error .= 'Path: ' . $filepath . '<br>';
@@ -105,6 +104,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             background: rgba(239, 68, 68, 0.3);
             color: #ef4444;
             border: 1px solid #ef4444;
+        }
+        /* Perbaikan tampilan metode pembayaran */
+        .payment-option {
+            display: none;
+            transition: all 0.3s ease;
+        }
+        .payment-option.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .upload-area {
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .upload-area:hover {
+            border-color: #c084fc !important;
+            background: rgba(168, 85, 247, 0.1);
+        }
+        .upload-area.dragover {
+            background: rgba(168, 85, 247, 0.2);
+            border-color: #c084fc !important;
         }
     </style>
 </head>
@@ -170,7 +194,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
 
                     <!-- QRIS Content -->
-                    <div id="qrisContent" class="payment-option active mb-4 p-3 rounded-3 bg-purple-dark border border-purple">
+                    <div id="qrisContent" class="payment-option mb-4 p-3 rounded-3 bg-purple-dark border border-purple">
                         <div class="text-center mb-3">
                             <div class="bg-dark rounded-3 p-3 d-inline-block mb-3">
                                 <img src="../assets/image/qris.jpg" alt="QRIS" class="img-fluid" style="max-width: 400px; border: 2px solid #a855f7; box-shadow: 0 0 15px rgba(168, 85, 247, 0.5);">
@@ -193,25 +217,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <ul class="list-group list-group-flush">
                                     <li class="list-group-item bg-transparent border-purple py-2">
                                         <div class="d-flex justify-content-between">
-                                            <span><i class="fas fa-university text-purple me-2"></i> Bank</span>
-                                            <strong class="text-white">BCA</strong>
+                                            <span class="text-white"><i class="fas fa-university text-purple me-2"></i> Bank</span>
+                                            <strong style="color: #ffffff !important;">BCA</strong> <!-- Warna putih -->
                                         </div>
                                     </li>
                                     <li class="list-group-item bg-transparent border-purple py-2">
                                         <div class="d-flex justify-content-between">
-                                            <span><i class="fas fa-hashtag text-purple me-2"></i> No Rekening</span>
+                                           <span class="text-white"><i class="fas fa-university text-purple me-2"></i> No Rekening </span>
                                             <strong class="text-warning">1234567890</strong>
                                         </div>
                                     </li>
                                     <li class="list-group-item bg-transparent border-purple py-2">
                                         <div class="d-flex justify-content-between">
-                                            <span><i class="fas fa-user text-purple me-2"></i> Atas Nama</span>
+                                            <span class="text-white"><i class="fas fa-university text-purple me-2"></i> Atas Nama</span>
                                             <strong class="text-success">PENTAS HUB</strong>
                                         </div>
                                     </li>
                                     <li class="list-group-item bg-transparent border-purple py-2">
                                         <div class="d-flex justify-content-between">
-                                            <span><i class="fas fa-money-bill-wave text-purple me-2"></i> Total Transfer</span>
+                                            <span class="text-white"><i class="fas fa-university text-purple me-2"></i> Total Transfer</span>
                                             <strong class="text-warning fs-4"><?= formatRupiah($order['total_harga']) ?></strong>
                                         </div>
                                     </li>
@@ -226,7 +250,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
 
                    <!-- Upload Bukti -->
-                    <div class="mt-4 p-3 bg-purple-dark rounded-3 border border-purple">
+                    <div id="uploadSection" class="mt-4 p-3 bg-purple-dark rounded-3 border border-purple" style="display: none;">
                         <label class="form-label fw-bold text-purple mb-3 d-block">
                             <i class="fas fa-file-image me-2"></i>Upload Bukti Pembayaran
                             <span class="text-muted small d-block mt-1">Pastikan gambar jelas dan terbaca</span>
@@ -243,8 +267,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
                     </div>
 
-
-                    <button type="submit" class="btn btn-custom w-100 py-3">
+                    <button type="submit" id="submitBtn" class="btn btn-custom w-100 py-3" disabled>
                         <i class="fas fa-paper-plane me-2"></i> UPLOAD BUKTI PEMBAYARAN
                     </button>
                     <div class="text-center mt-2 text-muted small">
@@ -261,38 +284,101 @@ document.addEventListener('DOMContentLoaded', function() {
     const metodeSelect = document.getElementById('metodeSelect');
     const qrisContent = document.getElementById('qrisContent');
     const transferContent = document.getElementById('transferContent');
+    const uploadSection = document.getElementById('uploadSection');
+    const submitBtn = document.getElementById('submitBtn');
     const uploadArea = document.querySelector('.upload-area');
     const fileInput = document.getElementById('fileInput');
     const filePreview = document.getElementById('filePreview');
 
     // Toggle metode pembayaran
     metodeSelect.addEventListener('change', function() {
-        const isActive = this.value === 'qris';
-        qrisContent.classList.toggle('active', isActive);
-        transferContent.classList.toggle('active', !isActive);
+        // Reset tampilan
+        qrisContent.classList.remove('active');
+        transferContent.classList.remove('active');
+        uploadSection.style.display = 'none';
+        submitBtn.disabled = true;
+        fileInput.value = '';
+        filePreview.innerHTML = '';
+        
+        // Tampilkan konten sesuai pilihan
+        if (this.value === 'qris') {
+            qrisContent.classList.add('active');
+            showUploadSection();
+        } else if (this.value === 'transfer') {
+            transferContent.classList.add('active');
+            showUploadSection();
+        }
     });
+
+    function showUploadSection() {
+        uploadSection.style.display = 'block';
+        setTimeout(() => {
+            uploadSection.style.opacity = 1;
+        }, 10);
+    }
+
+    // Drag & drop area
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, highlight, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, unhighlight, false);
+    });
+
+    function highlight() {
+        uploadArea.classList.add('dragover');
+    }
+
+    function unhighlight() {
+        uploadArea.classList.remove('dragover');
+    }
+
+    uploadArea.addEventListener('drop', handleDrop, false);
+
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        if (files.length) {
+            fileInput.files = files;
+            handleFileSelect();
+        }
+    }
 
     // Klik area upload
     uploadArea.addEventListener('click', () => fileInput.click());
 
     // Validasi & preview file
-    fileInput.addEventListener('change', function(e) {
-        filePreview.innerHTML = '';
-        if (!this.files[0]) return;
+    fileInput.addEventListener('change', handleFileSelect);
 
-        const file = this.files[0];
+    function handleFileSelect() {
+        filePreview.innerHTML = '';
+        if (!fileInput.files[0]) return;
+
+        const file = fileInput.files[0];
         const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
         const maxSize = 5 * 1024 * 1024; // 5MB
 
         if (!validTypes.includes(file.type)) {
-            filePreview.innerHTML = '<div class="text-danger">❌ Format tidak didukung (harus JPG/PNG/GIF)</div>';
-            this.value = '';
+            filePreview.innerHTML = '<div class="text-danger mt-2">❌ Format tidak didukung (harus JPG/PNG/GIF)</div>';
+            fileInput.value = '';
+            submitBtn.disabled = true;
             return;
         }
 
         if (file.size > maxSize) {
-            filePreview.innerHTML = '<div class="text-danger">❌ File terlalu besar (maks 5 MB)</div>';
-            this.value = '';
+            filePreview.innerHTML = '<div class="text-danger mt-2">❌ File terlalu besar (maks 5 MB)</div>';
+            fileInput.value = '';
+            submitBtn.disabled = true;
             return;
         }
 
@@ -300,12 +386,24 @@ document.addEventListener('DOMContentLoaded', function() {
         const reader = new FileReader();
         reader.onload = e => {
             filePreview.innerHTML = `
-                <img src="${e.target.result}" class="preview-image" style="max-width: 100%; max-height: 200px; margin: 0 auto;">
-                <div class="mt-2 text-success">✅ Siap diupload: ${file.name}</div>
+                <div class="position-relative d-inline-block">
+                    <img src="${e.target.result}" class="preview-image" style="max-width: 100%; max-height: 200px;">
+                    <button type="button" class="btn btn-sm btn-danger position-absolute rounded-circle" style="top: -10px; right: -10px;" onclick="removeFile()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="mt-2 text-success small">✅ ${file.name} (${Math.round(file.size/1024)} KB)</div>
             `;
+            submitBtn.disabled = false;
         };
         reader.readAsDataURL(file);
-    });
+    }
+
+    window.removeFile = function() {
+        fileInput.value = '';
+        filePreview.innerHTML = '';
+        submitBtn.disabled = true;
+    };
 
     // Set default ke QRIS
     metodeSelect.value = 'qris';
