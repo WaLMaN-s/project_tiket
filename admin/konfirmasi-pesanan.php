@@ -36,7 +36,7 @@ $result = $stmt->get_result();
       <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
         <div class="container-fluid">
             <a class="navbar-brand" href="dashboard.php">
-                ADMIN - PENTAS.<span>HUB</span>
+                ADMIN - KONSER<span>.FEATS</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>

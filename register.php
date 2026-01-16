@@ -9,7 +9,6 @@ if(isset($_SESSION['user_id'])) {
 }
 
 $error = '';
-$success = '';
 
 if(isset($_POST['register'])) {
     $nama = clean($_POST['nama']);
@@ -36,7 +35,17 @@ if(isset($_POST['register'])) {
                                           VALUES ('$nama', '$email', '$no_hp', '$password_hash', 'user')");
             
             if($query) {
-                $success = 'Registrasi berhasil! Silakan login.';
+                // Auto login setelah registrasi berhasil
+                $user_id = mysqli_insert_id($conn);
+                
+                // Set session
+                $_SESSION['user_id'] = $user_id;
+                $_SESSION['nama'] = $nama;
+                $_SESSION['email'] = $email;
+                $_SESSION['role'] = 'user';
+                
+                // Redirect ke halaman utama
+                redirect('index.php');
             } else {
                 $error = 'Registrasi gagal! ' . mysqli_error($conn);
             }
@@ -64,13 +73,6 @@ if(isset($_POST['register'])) {
             <?php if($error): ?>
                 <div class="alert alert-danger alert-dismissible fade show">
                     <?= $error ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            <?php endif; ?>
-            
-            <?php if($success): ?>
-                <div class="alert alert-success alert-dismissible fade show">
-                    <?= $success ?>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             <?php endif; ?>
