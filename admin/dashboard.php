@@ -41,6 +41,34 @@ $stmt_list = $conn->prepare("SELECT p.*, u.nama, u.email, t.jenis_tiket
                               LIMIT 10");
 $stmt_list->execute();
 $result_pesanan = $stmt_list->get_result();
+
+// Tren pesanan 7 hari terakhir (untuk grafik)
+$stmt_tren = $conn->prepare("SELECT DATE(tanggal_pesan) as tanggal, COUNT(*) as total
+                              FROM pesanan
+                              WHERE tanggal_pesan >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+                              GROUP BY DATE(tanggal_pesan)");
+$stmt_tren->execute();
+$pesanan_per_hari = [];
+$res_tren = $stmt_tren->get_result();
+while ($row = $res_tren->fetch_assoc()) {
+    $pesanan_per_hari[$row['tanggal']] = (int) $row['total'];
+}
+$chart_labels = [];
+$chart_data = [];
+for ($i = 6; $i >= 0; $i--) {
+    $tgl = date('Y-m-d', strtotime("-$i day"));
+    $chart_labels[] = date('d/m', strtotime($tgl));
+    $chart_data[] = $pesanan_per_hari[$tgl] ?? 0;
+}
+
+// Breakdown status pesanan (untuk grafik)
+$stmt_status = $conn->prepare("SELECT
+        SUM(status_pesanan = 'menunggu_konfirmasi') as menunggu,
+        SUM(status_pesanan = 'dikonfirmasi') as dikonfirmasi,
+        SUM(status_pesanan = 'dibatalkan') as dibatalkan
+    FROM pesanan");
+$stmt_status->execute();
+$status_breakdown = $stmt_status->get_result()->fetch_assoc();
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -53,41 +81,9 @@ $result_pesanan = $stmt_list->get_result();
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="dashboard.php">
-                ADMIN - KONSER <span>.FEATS</span>
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="dashboard.php">Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="data_tiket.php">Data Tiket</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="data_pesanan.php">Data Pesanan</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="konfirmasi-pesanan.php">Konfirmasi Pesanan</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="data_user.php">Data User</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="../logout.php">Logout</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+    <?php include __DIR__ . '/partials/sidebar.php'; ?>
 
-    <div class="dashboard-admin" style="margin-top: 80px;">
+    <div class="admin-main">
         <div class="container-fluid">
             <div class="dashboard-header">
                 <h2>
@@ -99,38 +95,52 @@ $result_pesanan = $stmt_list->get_result();
             <!-- Statistics Cards -->
             <div class="row mb-4">
                 <div class="col-md-3 mb-3">
-                    <div class="card-custom">
+                    <div class="stats-card tickets">
                         <h4><i class="fas fa-ticket-alt"></i> Total Tiket</h4>
-                        <h2 style="color: #8b00ff;"><?= $total_tiket ?></h2>
-                        <small class="text-muted">Semua jenis tiket</small>
+                        <div class="number"><?= $total_tiket ?></div>
+                        <div class="description">Semua jenis tiket</div>
                         <a href="data_tiket.php" class="btn btn-sm btn-custom mt-2">Lihat Detail</a>
                     </div>
                 </div>
                 <div class="col-md-3 mb-3">
-                    <div class="card-custom">
+                    <div class="stats-card users">
                         <h4><i class="fas fa-users"></i> Total User</h4>
-                        <h2 style="color: #00ff00;"><?= $total_user ?></h2>
-                        <small class="text-muted">User terdaftar</small>
+                        <div class="number"><?= $total_user ?></div>
+                        <div class="description">User terdaftar</div>
                         <a href="data_user.php" class="btn btn-sm btn-custom mt-2">Lihat Detail</a>
                     </div>
                 </div>
                 <div class="col-md-3 mb-3">
-                    <div class="card-custom">
+                    <div class="stats-card orders">
                         <h4><i class="fas fa-clock"></i> Menunggu Konfirmasi</h4>
-                        <h2 style="color: #ffd700;"><?= $total_menunggu ?></h2>
-                        <small class="text-muted">
-                            Total: <?= $total_pesanan ?> pesanan aktif
-                        </small>
+                        <div class="number"><?= $total_menunggu ?></div>
+                        <div class="description">Total: <?= $total_pesanan ?> pesanan aktif</div>
                         <a href="konfirmasi-pesanan.php" class="btn btn-sm btn-warning mt-2">
                             <i class="fas fa-check-circle me-1"></i> Proses Sekarang
                         </a>
                     </div>
                 </div>
                 <div class="col-md-3 mb-3">
-                    <div class="card-custom">
+                    <div class="stats-card revenue">
                         <h4><i class="fas fa-money-bill-wave"></i> Total Pendapatan</h4>
-                        <h2 style="color: #10b981;"><?= formatRupiah($total_pendapatan) ?></h2>
-                        <small class="text-muted">Dari pesanan dikonfirmasi</small>
+                        <div class="number" style="font-size: 1.7rem;"><?= formatRupiah($total_pendapatan) ?></div>
+                        <div class="description">Dari pesanan dikonfirmasi</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="row mb-4">
+                <div class="col-lg-8 mb-3">
+                    <div class="card-custom">
+                        <h3><i class="fas fa-chart-line"></i> Tren Pesanan (7 Hari Terakhir)</h3>
+                        <canvas id="chartPesanan" height="100"></canvas>
+                    </div>
+                </div>
+                <div class="col-lg-4 mb-3">
+                    <div class="card-custom">
+                        <h3><i class="fas fa-chart-pie"></i> Status Pesanan</h3>
+                        <canvas id="chartStatus" height="100"></canvas>
                     </div>
                 </div>
             </div>
@@ -206,5 +216,50 @@ $result_pesanan = $stmt_list->get_result();
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script>
+    Chart.defaults.color = '#cbd5e1';
+    Chart.defaults.borderColor = 'rgba(168, 85, 247, 0.15)';
+
+    new Chart(document.getElementById('chartPesanan'), {
+        type: 'line',
+        data: {
+            labels: <?= json_encode($chart_labels) ?>,
+            datasets: [{
+                label: 'Pesanan',
+                data: <?= json_encode($chart_data) ?>,
+                borderColor: '#a855f7',
+                backgroundColor: 'rgba(168, 85, 247, 0.15)',
+                tension: 0.35,
+                fill: true,
+                pointBackgroundColor: '#ec4899'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+        }
+    });
+
+    new Chart(document.getElementById('chartStatus'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Menunggu', 'Dikonfirmasi', 'Dibatalkan'],
+            datasets: [{
+                data: [
+                    <?= (int) ($status_breakdown['menunggu'] ?? 0) ?>,
+                    <?= (int) ($status_breakdown['dikonfirmasi'] ?? 0) ?>,
+                    <?= (int) ($status_breakdown['dibatalkan'] ?? 0) ?>
+                ],
+                backgroundColor: ['#fbbf24', '#10b981', '#ef4444']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { position: 'bottom' } }
+        }
+    });
+    </script>
 </body>
 </html>

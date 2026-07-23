@@ -1151,6 +1151,10 @@
     border-left: 4px solid #a855f7;
 }
 
+.menu-toggle {
+    display: none;
+}
+
 /* ===========================
    Alerts & Notifications
 =========================== */

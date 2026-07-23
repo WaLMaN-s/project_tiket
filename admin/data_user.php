@@ -20,41 +20,9 @@ $query = mysqli_query($conn, "SELECT * FROM users ORDER BY id DESC");
    
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="dashboard.php">
-                ADMIN - KONSER <span>.FEATS</span>
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="dashboard.php">Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="data_tiket.php">Data Tiket</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="data_pesanan.php">Data Pesanan</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="konfirmasi-pesanan.php">Konfirmasi Pesanan</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="data_user.php">Data User</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="../logout.php">Logout</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+    <?php include __DIR__ . '/partials/sidebar.php'; ?>
 
-    <div class="dashboard-container" style="margin-top: 80px;">
+    <div class="admin-main">
         <div class="container-fluid">
             <div class="dashboard-header">
                 <h2>
