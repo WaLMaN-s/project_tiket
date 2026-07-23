@@ -259,5 +259,6 @@ $total_pesanan = $count['total'];
             });
         });
     </script>
+    <script src="../assets/js/scroll-effects.js"></script>
 </body>
 </html>

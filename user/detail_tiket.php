@@ -322,5 +322,6 @@ $unique_code = 'PENTAS-' . strtoupper(substr(md5($order_id . $user_id . time()),
             }
         });
     </script>
+    <script src="../assets/js/scroll-effects.js"></script>
 </body>
 </html>

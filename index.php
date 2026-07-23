@@ -21,8 +21,33 @@ $result_tiket = $stmt->get_result();
     
     <!-- Font Awesome - FIXED URL (no extra spaces) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <style>
+        html {
+            scroll-behavior: smooth;
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+
+        .reveal.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .row .reveal:nth-child(1) { transition-delay: 0s; }
+        .row .reveal:nth-child(2) { transition-delay: 0.12s; }
+        .row .reveal:nth-child(3) { transition-delay: 0.24s; }
+        .row .reveal:nth-child(4) { transition-delay: 0.36s; }
+        .row .reveal:nth-child(n+5) { transition-delay: 0.48s; }
+
+        .terms-cards .reveal:nth-child(1) { transition-delay: 0s; }
+        .terms-cards .reveal:nth-child(2) { transition-delay: 0.12s; }
+        .terms-cards .reveal:nth-child(3) { transition-delay: 0.24s; }
+
         /* Global Styles */
     :root {
     --purple-dark: #0f0c29;
@@ -104,10 +129,6 @@ $result_tiket = $stmt->get_result();
         
         /* Hero Section */
         .hero-section {
-            background-image: linear-gradient(rgba(15, 12, 41, 0.85), rgba(48, 43, 99, 0.85)), 
-                  url('https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?w=1920&q=80');
-            background-size: cover;
-            background-position: center;
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -117,7 +138,26 @@ $result_tiket = $stmt->get_result();
             position: relative;
             overflow: hidden;
         }
-        
+
+        .hero-bg {
+            position: absolute;
+            top: -15%;
+            left: 0;
+            width: 100%;
+            height: 130%;
+            background-image: linear-gradient(rgba(15, 12, 41, 0.85), rgba(48, 43, 99, 0.85)),
+                  url('https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            z-index: 0;
+            will-change: transform;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
         .hero-title {
             font-size: 4rem;
             font-weight: 900;
@@ -639,6 +679,7 @@ $result_tiket = $stmt->get_result();
 
     <!-- Hero Section -->
     <section id="home" class="hero-section">
+        <div class="hero-bg"></div>
         <div class="hero-content text-center">
             <h1 class="hero-title">TIKET KONSER FEATS</h1>
             <p class="hero-subtitle">GRAND MUSIC FESTIVAL</p>
@@ -905,5 +946,6 @@ $result_tiket = $stmt->get_result();
         updateCountdown();
         setInterval(updateCountdown, 1000);
     </script>
+    <script src="assets/js/scroll-effects.js"></script>
 </body>
 </html>

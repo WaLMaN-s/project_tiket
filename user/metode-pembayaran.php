@@ -410,5 +410,6 @@ document.addEventListener('DOMContentLoaded', function() {
     metodeSelect.dispatchEvent(new Event('change'));
 });
 </script>
+    <script src="../assets/js/scroll-effects.js"></script>
 </body>
 </html>
