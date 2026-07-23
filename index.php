@@ -27,6 +27,12 @@ $result_tiket = $stmt->get_result();
             scroll-behavior: smooth;
         }
 
+        /* Navbar-nya fixed-top, jadi section yang di-scroll-ke (lewat klik menu
+           atau JS) perlu jarak biar judulnya tidak ketutupan navbar. */
+        #home, #tickets, #terms {
+            scroll-margin-top: 90px;
+        }
+
         .reveal {
             opacity: 0;
             transform: translateY(40px);
@@ -527,9 +533,35 @@ $result_tiket = $stmt->get_result();
     .terms-header h2 {
         font-size: 2.5rem;
     }
-    
+
     .terms-cards {
         grid-template-columns: 1fr;
+    }
+
+    /* Navbar-nya fixed-top (keluar dari alur normal), jadi konten hero
+       yang di-tengahkan vertikal perlu jarak atas biar tidak ketutupan. */
+    .hero-section {
+        padding-top: 140px;
+        padding-bottom: 2rem;
+        min-height: auto;
+    }
+
+    .hero-title {
+        font-size: 2.4rem;
+        letter-spacing: 4px;
+    }
+
+    .hero-subtitle {
+        font-size: 1.4rem;
+        letter-spacing: 3px;
+    }
+
+    .hero-date {
+        font-size: 1.2rem;
+    }
+
+    .hero-info {
+        font-size: 1rem;
     }
 }
 .footer {
