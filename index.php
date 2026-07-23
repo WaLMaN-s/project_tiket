@@ -8,6 +8,17 @@ require_once 'includes/session.php';
 $stmt = $conn->prepare("SELECT * FROM tiket WHERE status='tersedia' AND stok > 0 ORDER BY harga ASC");
 $stmt->execute();
 $result_tiket = $stmt->get_result();
+
+// Info konser (tanggal/waktu/lokasi) diambil dari data tiket yang paling dekat,
+// jadi admin cukup atur lewat form Edit Tiket - tidak perlu tempat pengaturan terpisah.
+$stmt_event = $conn->prepare("SELECT tanggal_event, waktu_event, lokasi FROM tiket ORDER BY tanggal_event ASC LIMIT 1");
+$stmt_event->execute();
+$event_info = $stmt_event->get_result()->fetch_assoc();
+
+$event_tanggal_display = $event_info ? formatTanggal($event_info['tanggal_event']) : '-';
+$event_waktu_display = $event_info ? formatWaktu($event_info['waktu_event']) : '-';
+$event_lokasi_display = $event_info ? $event_info['lokasi'] : '-';
+$event_datetime_iso = $event_info ? date('Y-m-d\TH:i:s', strtotime($event_info['tanggal_event'] . ' ' . $event_info['waktu_event'])) : null;
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -721,7 +732,7 @@ $result_tiket = $stmt->get_result();
         <div class="hero-content text-center">
             <h1 class="hero-title">TIKET KONSER FEATS</h1>
             <p class="hero-subtitle">GRAND MUSIC FESTIVAL</p>
-            <p class="hero-date">14 February 2026</p>
+            <p class="hero-date"><?= htmlspecialchars($event_tanggal_display) ?></p>
             
             <!-- Countdown Timer -->
             <div class="countdown-container my-4">
@@ -747,8 +758,8 @@ $result_tiket = $stmt->get_result();
             </div>
 
             <p class="hero-info">
-                <i class="fas fa-map-marker-alt"></i> GBK SENAYAN, JAKARTA<br>
-                <i class="fas fa-clock"></i> 19.30 WIB - SELESAI
+                <i class="fas fa-map-marker-alt"></i> <?= htmlspecialchars(strtoupper($event_lokasi_display)) ?><br>
+                <i class="fas fa-clock"></i> <?= htmlspecialchars($event_waktu_display) ?> - SELESAI
             </p>
             <a href="#tickets" class="btn btn-custom">
                 <i class="fas fa-ticket-alt me-2"></i> DAFTAR HARGA TIKET
@@ -958,7 +969,7 @@ $result_tiket = $stmt->get_result();
     
     <!-- Countdown Timer -->
     <script>
-        const targetDate = new Date('2026-02-14T19:30:00+07:00');
+        const targetDate = new Date('<?= $event_datetime_iso ? $event_datetime_iso . '+07:00' : '' ?>');
 
         function updateCountdown() {
             const now = new Date();
