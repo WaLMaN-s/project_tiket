@@ -660,6 +660,12 @@ $result_tiket = $stmt->get_result();
   object-position: center 62%; /* default: 50% (tengah). Naikkan angka >50% untuk geser fokus ke bawah */
 }
 
+@media (max-width: 768px) {
+    .foto-section {
+        height: 45vh;
+    }
+}
+
     </style>
 </head>
 <body>
